@@ -25,7 +25,7 @@ const SnowEffect: FC = () => {
 
   const options: ISourceOptions = useMemo(
     () => ({
-      fpsLimit: 120,
+      fpsLimit: 60,
       interactivity: {
         events: {
           onHover: {
@@ -48,10 +48,10 @@ const SnowEffect: FC = () => {
           direction: MoveDirection.bottom, // movimiento continuo hacia abajo
           enable: true,
           outModes: {
-            default: OutMode.out, // partículas desaparecen al salir del area
+            default: OutMode.out, // particulas desaparecen al salir del area
           },
           random: true,
-          speed: 2, // velocidad de caida para efecto de nieve más realista
+          speed: 2, // velocidad de caida
           straight: false,
         },
         number: {
@@ -59,7 +59,7 @@ const SnowEffect: FC = () => {
             enable: true,
             area: 800,
           },
-          value: 100, // Número de partículas
+          value: 100,
         },
         opacity: {
           value: 0.7,
@@ -78,13 +78,11 @@ const SnowEffect: FC = () => {
 
   if (init) {
     return (
-      <div className="absolute top-0 left-0 w-full h-full z-10">
-        <Particles
-          id="tsparticles"
-          particlesLoaded={particlesLoaded}
-          options={options}
-        />
-      </div>
+      <Particles
+        id="tsparticles"
+        particlesLoaded={particlesLoaded}
+        options={options}
+      />
     );
   }
 

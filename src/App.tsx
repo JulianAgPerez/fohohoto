@@ -1,12 +1,13 @@
 import React from "react";
 import SnowEffect from "./components/SnowEffect";
+import Home from "./view/Home";
 
 const App: React.FC = () => {
   return (
-    <div className="relative flex justify-center items-center h-screen">
+    <>
+      <Home />
       <SnowEffect />
-      <h1 className="text-center text-red-500 z-20">¡Feliz Navidad!</h1>
-    </div>
+    </>
   );
 };
 
