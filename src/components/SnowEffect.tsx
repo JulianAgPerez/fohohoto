@@ -25,11 +25,6 @@ const SnowEffect: FC = () => {
 
   const options: ISourceOptions = useMemo(
     () => ({
-      background: {
-        color: {
-          value: "#0d47a1",
-        },
-      },
       fpsLimit: 120,
       interactivity: {
         events: {
@@ -83,11 +78,13 @@ const SnowEffect: FC = () => {
 
   if (init) {
     return (
-      <Particles
-        id="tsparticles"
-        particlesLoaded={particlesLoaded}
-        options={options}
-      />
+      <div className="absolute top-0 left-0 w-full h-full z-10">
+        <Particles
+          id="tsparticles"
+          particlesLoaded={particlesLoaded}
+          options={options}
+        />
+      </div>
     );
   }
 

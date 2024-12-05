@@ -3,9 +3,9 @@ import SnowEffect from "./components/SnowEffect";
 
 const App: React.FC = () => {
   return (
-    <div>
-      <h1 className="text-center text-white z-20">¡Feliz Navidad!</h1>
+    <div className="relative flex justify-center items-center h-screen">
       <SnowEffect />
+      <h1 className="text-center text-red-500 z-20">¡Feliz Navidad!</h1>
     </div>
   );
 };
