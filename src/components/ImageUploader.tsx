@@ -8,6 +8,7 @@ import { Source } from "@cloudinary/url-gen/qualifiers/source";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
+const folder = "Fohohoto/";
 
 const backgrounds = ["bg4-min_e4fvtg", "bg1-min_yuud79", "bg3-min_jhpgza"];
 
@@ -60,14 +61,14 @@ const ImageUploader: React.FC = () => {
       .resize(Resize.fill().width(500).height(500))
       .overlay(
         Overlay.source(
-          Source.image(background).transformation(
+          Source.image(folder + background).transformation(
             new Transformation().resize(Resize.fill().width(500).height(500))
           )
         )
       )
       .overlay(
         Overlay.source(
-          Source.image("pngwing.com-min_hqpcyl").transformation(
+          Source.image(folder + "pngwing.com-min_hqpcyl").transformation(
             new Transformation().resize(Resize.fill().width(100).height(100))
           )
         ).position(
