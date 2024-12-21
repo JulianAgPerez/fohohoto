@@ -1,96 +1,102 @@
 import React, { useState } from "react";
 import { Cloudinary, Transformation } from "@cloudinary/url-gen";
+import { AdvancedImage } from "@cloudinary/react";
+import { Resize } from "@cloudinary/url-gen/actions/resize";
 import { Position } from "@cloudinary/url-gen/qualifiers/position";
 import { Gravity } from "@cloudinary/url-gen/qualifiers/gravity";
-import { AdvancedImage } from "@cloudinary/react";
-import { Overlay, Resize } from "@cloudinary/url-gen/actions";
-import { Source } from "@cloudinary/url-gen/qualifiers/source";
+import { Overlay } from "@cloudinary/url-gen/actions/overlay";
+import { image } from "@cloudinary/url-gen/qualifiers/source";
+import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
 const folder = "Fohohoto/";
 
-const backgrounds = ["bg4-min_e4fvtg", "bg1-min_yuud79", "bg3-min_jhpgza"];
+const backgrounds = [
+  { key: "christmas", description: "Add a christmas background" },
+  {
+    key: "snow",
+    description: "Add snow and a christmas tree to the background",
+  },
+  { key: "trees", description: "Add some pines with snow to the background" },
+];
 
 const ImageUploader: React.FC = () => {
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageId, setImageId] = useState<string | null>(null);
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
-  const [selectedBackground, setSelectedBackground] = useState<string>(
-    backgrounds[0]
+  const [transformedImageId, setTransformedImageId] = useState<string | null>(
+    null
   );
+  const [selectedBackground, setSelectedBackground] = useState<string>(
+    backgrounds[0].key
+  );
+  const cld = new Cloudinary({ cloud: { cloudName: cloud_name } });
 
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files[0]) {
+      setImageFile(files[0]);
+    }
+  };
+
+  const handleUploadAndTransform = async () => {
+    if (imageFile) {
       const formData = new FormData();
-      formData.append("file", files[0]);
+      formData.append("file", imageFile);
       formData.append("upload_preset", upload_preset);
 
-      // Subir la imagen a Cloudinary
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-        {
-          method: "POST",
-          body: formData,
+      try {
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      );
 
-      const data = await response.json();
-      setImageId(data.public_id);
+        const data = await response.json();
+        setImageId(data.public_id);
 
-      // Generar URL transformada
-      const transformedUrl = applyChristmasEffects(
-        data.public_id,
-        selectedBackground
-      );
-      setTransformedImage(transformedUrl);
+        const transformedUrl = applyChristmasEffects(
+          data.public_id,
+          selectedBackground
+        );
+        setTransformedImage(transformedUrl);
+        const url = new URL(transformedUrl);
+        const transformedImageId = url.pathname.split("/").pop();
+        setTransformedImageId(transformedImageId!);
+        console.log("Image uploaded and transformed:", data);
+        console.log("Transformed image URL:", transformedUrl);
+        console.log("Transformed image ID:", transformedImageId);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
     }
   };
 
   const applyChristmasEffects = (imageId: string, background: string) => {
-    const cld = new Cloudinary({
-      cloud: { cloudName: cloud_name },
-      url: { secure: true },
-    });
-
     const cldImage = cld.image(imageId);
 
     cldImage
       .resize(Resize.fill().width(500).height(500))
-      .overlay(
-        Overlay.source(
-          Source.image(folder + background).transformation(
-            new Transformation().resize(Resize.fill().width(500).height(500))
-          )
-        )
-      )
-      .overlay(
-        Overlay.source(
-          Source.image(folder + "pngwing.com-min_hqpcyl").transformation(
-            new Transformation().resize(Resize.fill().width(100).height(100))
-          )
-        ).position(
-          new Position()
-            .gravity(Gravity.compass("north_east"))
-            .offsetX(10)
-            .offsetY(10)
-        )
-      )
+      .effect(generativeBackgroundReplace().prompt(background))
+
       .format("auto")
       .quality("auto")
       .addFlag("lossy");
-
     return cldImage.toURL();
   };
-
   return (
     <div className="image-uploader p-4">
       <h1 className="text-2xl font-bold mb-4">Sube tu imagen navideña 🎄</h1>
       <input
         type="file"
-        onChange={handleImageUpload}
+        onChange={handleFileChange}
         className="mb-4 border p-2"
       />
       <select
@@ -99,31 +105,39 @@ const ImageUploader: React.FC = () => {
         className="mb-4 border p-2"
       >
         {backgrounds.map((bg) => (
-          <option key={bg} value={bg}>
-            {bg}
+          <option key={bg.key} value={bg.key}>
+            {bg.description}
           </option>
         ))}
       </select>
-      {imageId && (
-        <div className="mt-4">
-          <h2 className="text-xl font-semibold mb-2">Imagen Original:</h2>
-          <AdvancedImage
-            cldImg={
-              new Cloudinary({
-                cloud: { cloudName: cloud_name },
-              }).image(imageId) as any
-            }
-          />
-        </div>
-      )}
-      {transformedImage && (
-        <div className="mt-4">
-          <h2 className="text-xl font-semibold mb-2">Imagen Navideña:</h2>
-          <img src={transformedImage} alt="Imagen Navideña" />
-        </div>
-      )}
+      <button
+        onClick={handleUploadAndTransform}
+        className="mb-4 border p-2 bg-blue-500 text-white"
+      >
+        Subir y Transformar Imagen
+      </button>
+      <div className="flex flex-wrap gap-4">
+        {/*Imagen original */}
+        {imageId && (
+          <div className="w-1/2 h-52">
+            <AdvancedImage
+              cldImg={cld.image(imageId)}
+              style={{ width: 300, height: 300, objectFit: "cover" }}
+            />
+          </div>
+        )}
+        {/*Imagen transformada */}
+
+        {transformedImage && (
+          <div className="w-1/2 h-52">
+            <AdvancedImage
+              cldImg={cld.image(transformedImageId!)}
+              style={{ width: 300, height: 300, objectFit: "cover" }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
-
 export default ImageUploader;
