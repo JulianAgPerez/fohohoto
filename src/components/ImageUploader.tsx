@@ -6,7 +6,6 @@ import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect"
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
-const folder = "Fohohoto/";
 
 const backgrounds = [
   { key: "christmas", description: "Add a christmas background" },
@@ -14,7 +13,14 @@ const backgrounds = [
     key: "snow",
     description: "Add snow and a christmas tree to the background",
   },
-  { key: "trees", description: "Add some pines with snow to the background" },
+  {
+    key: "Santa Claus",
+    description: "Add Santa Claus going in the sky to the background",
+  },
+  {
+    key: "Gifts",
+    description: "Add gifts and a christmas tree to the background",
+  },
 ];
 
 const ImageUploader: React.FC = () => {
@@ -79,11 +85,9 @@ const ImageUploader: React.FC = () => {
     const cldImage = cld.image(imageId);
 
     cldImage
-      .resize(Resize.fill().width(500).height(500))
       .effect(generativeBackgroundReplace().prompt(background))
       .format("auto")
-      .quality("auto")
-      .addFlag("lossy");
+      .quality("auto:good");
     return cldImage.toURL();
   };
   return (
@@ -125,8 +129,9 @@ const ImageUploader: React.FC = () => {
 
         {transformedImage && (
           <div className="w-1/2 h-52">
-            <AdvancedImage
-              cldImg={cld.image(transformedImageId!)}
+            <img
+              src={transformedImage}
+              alt="Imagen Navideña"
               style={{ width: 300, height: 300, objectFit: "cover" }}
             />
           </div>
