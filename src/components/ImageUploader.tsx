@@ -83,51 +83,55 @@ const ImageUploader: React.FC = () => {
     return cldImage.toURL();
   };
   return (
-    <div className="image-uploader p-4">
-      <h1 className="text-2xl font-bold mb-4">Sube tu imagen navideña 🎄</h1>
-      <input
-        type="file"
-        onChange={handleFileChange}
-        className="mb-4 border p-2"
-      />
-      <select
-        value={selectedBackground}
-        onChange={(e) => setSelectedBackground(e.target.value)}
-        className="mb-4 border p-2"
-      >
-        {backgrounds.map((bg) => (
-          <option key={bg.key} value={bg.key}>
-            {bg.description}
-          </option>
-        ))}
-      </select>
-      <button
-        onClick={handleUploadAndTransform}
-        className="mb-4 border p-2 bg-blue-500 text-white"
-      >
-        Subir y Transformar Imagen
-      </button>
-      <div className="flex flex-wrap gap-4">
-        {/*Imagen original */}
-        {imageId && (
-          <div className="w-1/2 h-52">
-            <AdvancedImage
-              cldImg={cld.image(imageId)}
-              style={{ width: 300, height: 300, objectFit: "cover" }}
-            />
-          </div>
-        )}
-        {/*Imagen transformada */}
+    <div className="flex justify-center items-center h-full bg-blue-900">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-center text-4xl text-red-500 font-bold mb-4">
+          Sube tu imagen navideña 🎄
+        </h1>
+        <input
+          type="file"
+          onChange={handleFileChange}
+          className="mb-4 border p-2 w-full"
+        />
+        <select
+          value={selectedBackground}
+          onChange={(e) => setSelectedBackground(e.target.value)}
+          className="mb-4 border p-2 w-full"
+        >
+          {backgrounds.map((bg) => (
+            <option key={bg.key} value={bg.key}>
+              {bg.description}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleUploadAndTransform}
+          className="mb-4 border p-2 bg-green-500 text-white w-full rounded-lg hover:bg-green-700 transition duration-300"
+        >
+          Subir y Transformar Imagen
+        </button>
+        <div className="flex flex-wrap gap-4">
+          {/*Imagen original */}
+          {imageId && (
+            <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg mb-4">
+              <AdvancedImage
+                cldImg={cld.image(imageId)}
+                style={{ width: 300, height: 300, objectFit: "cover" }}
+              />
+            </div>
+          )}
+          {/*Imagen transformada */}
 
-        {transformedImage && (
-          <div className="w-1/2 h-52">
-            <img
-              src={transformedImage}
-              alt="Imagen Navideña"
-              style={{ width: 300, height: 300, objectFit: "cover" }}
-            />
-          </div>
-        )}
+          {transformedImage && (
+            <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg">
+              <img
+                src={transformedImage}
+                alt="Imagen Navideña"
+                style={{ width: 300, height: 300, objectFit: "cover" }}
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
