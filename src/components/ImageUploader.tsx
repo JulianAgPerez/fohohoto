@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from "@cloudinary/react";
-import { Resize } from "@cloudinary/url-gen/actions/resize";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
@@ -27,9 +26,6 @@ const ImageUploader: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageId, setImageId] = useState<string | null>(null);
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
-  const [transformedImageId, setTransformedImageId] = useState<string | null>(
-    null
-  );
   const [selectedBackground, setSelectedBackground] = useState<string>(
     backgrounds[0].key
   );
@@ -69,12 +65,8 @@ const ImageUploader: React.FC = () => {
           selectedBackground
         );
         setTransformedImage(transformedUrl);
-        const url = new URL(transformedUrl);
-        const transformedImageId = url.pathname.split("/").pop();
-        setTransformedImageId(transformedImageId!);
         console.log("Image uploaded and transformed:", data);
         console.log("Transformed image URL:", transformedUrl);
-        console.log("Transformed image ID:", transformedImageId);
       } catch (error) {
         console.error("Error uploading image:", error);
       }
