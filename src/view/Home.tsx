@@ -6,11 +6,17 @@ const Home = () => {
   const [index, setIndex] = useState(0);
   const translations = Object.values(ChristmasDictionary);
 
-  // Encuentra la palabra más larga para calcular el ancho fijo
-  const longestWord = translations.reduce(
-    (longest, word) => (word.length > longest.length ? word : longest),
-    ""
+  //Encuentra la palabra más larga
+  const longestWord = translations.reduce((a, b) =>
+    a.length > b.length ? a : b
   );
+
+  const getWidth = (length: number) => {
+    if (length <= 5) return "5ch";
+    if (length <= 8) return "9ch";
+    if (length <= 10) return "12ch";
+    return "14ch";
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -21,7 +27,7 @@ const Home = () => {
 
   return (
     <div className="relative flex justify-center items-center h-screen bg-blue-900">
-      <h1 className="text-center text-9xl text-red-500 z-20">
+      <h1 className="text-center text-9xl text-red-500 z-20 flex items-center ">
         ¡Feliz{" "}
         <AnimatePresence mode="wait">
           <motion.span
@@ -30,15 +36,15 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.5 }}
-            className="inline-block"
+            className="inline-flex justify-center"
             style={{
-              width: `${longestWord.length * 0.8}ch`,
+              width: getWidth(translations[index].length),
             }}
           >
             {translations[index]}
           </motion.span>
         </AnimatePresence>
-        !
+        <span>!</span>
       </h1>
     </div>
   );
