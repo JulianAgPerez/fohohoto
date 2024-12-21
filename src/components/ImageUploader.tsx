@@ -1,11 +1,7 @@
 import React, { useState } from "react";
-import { Cloudinary, Transformation } from "@cloudinary/url-gen";
+import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from "@cloudinary/react";
 import { Resize } from "@cloudinary/url-gen/actions/resize";
-import { Position } from "@cloudinary/url-gen/qualifiers/position";
-import { Gravity } from "@cloudinary/url-gen/qualifiers/gravity";
-import { Overlay } from "@cloudinary/url-gen/actions/overlay";
-import { image } from "@cloudinary/url-gen/qualifiers/source";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
@@ -85,7 +81,6 @@ const ImageUploader: React.FC = () => {
     cldImage
       .resize(Resize.fill().width(500).height(500))
       .effect(generativeBackgroundReplace().prompt(background))
-
       .format("auto")
       .quality("auto")
       .addFlag("lossy");
