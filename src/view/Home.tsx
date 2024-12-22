@@ -6,11 +6,12 @@ const Home = () => {
   const [index, setIndex] = useState(0);
   const translations = Object.values(ChristmasDictionary);
 
+  /** 
   //Encuentra la palabra más larga
   const longestWord = translations.reduce((a, b) =>
     a.length > b.length ? a : b
   );
-
+**/
   const getWidth = (length: number) => {
     if (length <= 5) return "5ch";
     if (length <= 8) return "9ch";
