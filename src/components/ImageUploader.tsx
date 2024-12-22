@@ -137,6 +137,25 @@ const ImageUploader: React.FC = () => {
     }
   };
 
+  const handleDownload = async () => {
+    if (transformedImage) {
+      try {
+        const response = await fetch(transformedImage);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "imagen_navidena.jpg";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error("Error al descargar la imagen:", error);
+      }
+    }
+  };
+
   return (
     <div className="flex justify-center items-center h-full bg-blue-900">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -206,6 +225,25 @@ const ImageUploader: React.FC = () => {
               )
             )}
           </div>
+          {/* Botones Ver y Descargar */}
+          {transformedImage && (
+            <div className="flex justify-between mt-4 w-full gap-4 text-white ">
+              <a
+                href={transformedImage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border p-2 bg-green-500  rounded-lg hover:bg-green-700 transition duration-300 flex-1 text-center"
+              >
+                Ver Imagen
+              </a>
+              <button
+                onClick={handleDownload}
+                className="border p-2 bg-green-500 rounded-lg hover:bg-green-700 transition duration-300 flex-1 text-center"
+              >
+                Descargar Imagen
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
