@@ -126,35 +126,43 @@ const ImageUploader: React.FC = () => {
         <div className="flex flex-wrap gap-4">
           {/*Imagen original */}
           {imageId && (
-            <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg mb-4">
+            <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg mb-4 justify-center items-center flex">
               <AdvancedImage
                 cldImg={cld.image(imageId)}
-                style={{ width: 300, height: 300, objectFit: "cover" }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "fill",
+                }}
               />
             </div>
           )}
           {/*Imagen transformada */}
-          {loading ? (
-            <div
-              className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-success motion-reduce:animate-[spin_1.5s_linear_infinite]"
-              role="status"
-            >
-              <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
-                Loading...
-              </span>
-            </div>
-          ) : (
-            transformedImage && (
-              <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg">
+          <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg justify-center items-center flex">
+            {loading ? (
+              <div
+                className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-success motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                role="status"
+              >
+                <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                  Loading...
+                </span>
+              </div>
+            ) : (
+              transformedImage && (
                 <img
                   src={transformedImage}
                   alt="Imagen Navideña"
                   onLoad={() => setLoading(false)}
-                  style={{ width: 300, height: 300, objectFit: "cover" }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "fill",
+                  }}
                 />
-              </div>
-            )
-          )}
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>
