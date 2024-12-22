@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from "@cloudinary/react";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
+import { scale } from "@cloudinary/url-gen/actions/resize";
+import { desc } from "motion/react-client";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
@@ -10,16 +12,21 @@ const backgrounds = [
   { key: "christmas", description: "Add a christmas background" },
   {
     key: "snow",
-    description: "Add snow and a christmas tree to the background",
+    description: "Add snow and a Christmas atmosphere to the background",
   },
   {
     key: "Santa Claus",
-    description: "Add Santa Claus going in the sky to the background",
+    description: "Add santa claus in the sky with snow",
   },
   {
     key: "Gifts",
     description: "Add gifts and a christmas tree to the background",
   },
+  {
+    key: "Elf",
+    description: "Add an elf to the background and add me a Christmas hat",
+  },
+  { key: "Im a Grinch", description: "Add a Grinch to the background" },
 ];
 
 const ImageUploader: React.FC = () => {
@@ -78,8 +85,9 @@ const ImageUploader: React.FC = () => {
 
     cldImage
       .effect(generativeBackgroundReplace().prompt(background))
+      .resize(scale().width(1000).height(1000))
       .format("auto")
-      .quality("auto:good");
+      .quality("auto:best");
     return cldImage.toURL();
   };
   return (
