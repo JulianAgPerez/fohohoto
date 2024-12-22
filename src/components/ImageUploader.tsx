@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
-import { AdvancedImage } from "@cloudinary/react";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
 import { scale } from "@cloudinary/url-gen/actions/resize";
-import { desc } from "motion/react-client";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
@@ -31,7 +29,7 @@ const backgrounds = [
 
 const ImageUploader: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageId, setImageId] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
   const [selectedBackground, setSelectedBackground] = useState<string>(
     backgrounds[0].key
@@ -43,7 +41,14 @@ const ImageUploader: React.FC = () => {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files[0]) {
-      setImageFile(files[0]);
+      const file = files[0];
+      const validImageTypes = ["image/jpeg", "image/png", "image/webp"];
+      if (!validImageTypes.includes(file.type)) {
+        alert("Por favor, sube una imagen válida (JPEG, PNG, WEBP).");
+        return;
+      }
+      setImageFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
@@ -68,17 +73,24 @@ const ImageUploader: React.FC = () => {
         }
 
         const data = await response.json();
-        setImageId(data.public_id);
 
         const transformedUrl = applyChristmasEffects(
           data.public_id,
           selectedBackground
         );
-        setTransformedImage(transformedUrl);
+
+        const uploadedTransformedImage = await uploadTransformedImage(
+          transformedUrl
+        );
+
+        setTransformedImage(uploadedTransformedImage);
         console.log("Image uploaded and transformed:", data);
         console.log("Transformed image URL:", transformedUrl);
       } catch (error) {
         console.error("Error uploading image:", error);
+        alert(
+          "Hubo un problema al subir o transformar la imagen. Intenta nuevamente."
+        );
       } finally {
         setLoading(false);
       }
@@ -95,6 +107,36 @@ const ImageUploader: React.FC = () => {
       .quality("auto:best");
     return cldImage.toURL();
   };
+
+  const uploadTransformedImage = async (transformedUrl: string) => {
+    const formData = new FormData();
+    formData.append("file", transformedUrl);
+    formData.append("upload_preset", upload_preset);
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Error al subir la imagen transformada: ${response.statusText}`
+        );
+      }
+
+      const data = await response.json();
+      console.log("Imagen transformada subida con éxito:", data);
+      return data.secure_url;
+    } catch (error) {
+      console.error("Error al subir la imagen transformada:", error);
+      throw error;
+    }
+  };
+
   return (
     <div className="flex justify-center items-center h-full bg-blue-900">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -124,11 +166,12 @@ const ImageUploader: React.FC = () => {
           Subir y Transformar Imagen
         </button>
         <div className="flex flex-wrap gap-4">
-          {/*Imagen original */}
-          {imageId && (
+          {/* Imagen original */}
+          {previewUrl && (
             <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg mb-4 justify-center items-center flex">
-              <AdvancedImage
-                cldImg={cld.image(imageId)}
+              <img
+                src={previewUrl}
+                alt="Imagen Seleccionada"
                 style={{
                   width: "100%",
                   height: "100%",
@@ -137,7 +180,7 @@ const ImageUploader: React.FC = () => {
               />
             </div>
           )}
-          {/*Imagen transformada */}
+          {/* Imagen transformada */}
           <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg justify-center items-center flex">
             {loading ? (
               <div
@@ -168,4 +211,5 @@ const ImageUploader: React.FC = () => {
     </div>
   );
 };
+
 export default ImageUploader;
