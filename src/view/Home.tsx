@@ -27,8 +27,8 @@ const Home = () => {
   }, [translations]);
 
   return (
-    <div className="relative flex justify-center items-center h-screen bg-blue-900">
-      <h1 className="text-center text-9xl text-red-500 z-20 flex items-center ">
+    <div className="relative flex justify-center items-center h-screen bg-blue-900 p-4">
+      <h1 className="text-center text-3xl sm:text-6xl md:text-8xl lg:text-9xl text-red-500 z-20 flex items-center font-christmas">
         ¡Feliz{" "}
         <AnimatePresence mode="wait">
           <motion.span
