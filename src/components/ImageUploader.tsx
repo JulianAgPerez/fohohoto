@@ -7,9 +7,9 @@ const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
 
 const backgrounds = [
-  { key: "christmas", description: "Add a christmas background" },
+  { key: "Navideño", description: "Add a christmas background" },
   {
-    key: "snow",
+    key: "Nieve",
     description: "Add snow and a Christmas atmosphere to the background",
   },
   {
@@ -17,14 +17,14 @@ const backgrounds = [
     description: "Add santa claus in the sky with snow",
   },
   {
-    key: "Gifts",
+    key: "¡Regalos!",
     description: "Add gifts and a christmas tree to the background",
   },
   {
-    key: "Elf",
+    key: "Elfos",
     description: "Add an elf to the background and add me a Christmas hat",
   },
-  { key: "Im a Grinch", description: "Add a Grinch to the background" },
+  { key: "Soy un Grinch", description: "Add a Grinch to the background" },
 ];
 
 const ImageUploader: React.FC = () => {
@@ -167,6 +167,9 @@ const ImageUploader: React.FC = () => {
           onChange={handleFileChange}
           className="mb-4 border p-2 w-full"
         />
+        <label className="text-center justify-center items-center flex mb-4">
+          Seleccione un fondo
+        </label>
         <select
           value={selectedBackground}
           onChange={(e) => setSelectedBackground(e.target.value)}
@@ -180,7 +183,7 @@ const ImageUploader: React.FC = () => {
         </select>
         <button
           onClick={handleUploadAndTransform}
-          className="mb-4 border p-2 bg-green-500 text-white w-full rounded-lg hover:bg-green-700 transition duration-300"
+          className="mb-4 border p-2 bg-green-500 text-white w-full rounded-lg hover:bg-green-700 transition duration-300 font-bold"
         >
           Subir y Transformar Imagen
         </button>
