@@ -174,7 +174,7 @@ const ImageUploader: React.FC = () => {
         >
           {backgrounds.map((bg) => (
             <option key={bg.key} value={bg.key}>
-              {bg.description}
+              {bg.key}
             </option>
           ))}
         </select>
