@@ -1,50 +1,75 @@
-# React + TypeScript + Vite
+# Fohohoto
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Fohohoto es una aplicación web para subir imágenes y aplicar efectos navideños utilizando la API de Cloudinary. Los usuarios pueden elegir entre diferentes fondos y transformaciones para sus imágenes.
 
-Currently, two official plugins are available:
+## Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Subida de imágenes (JPEG, PNG, WEBP).
+- Transformaciones con efectos navideños: fondo con nieve, regalos, Santa Claus, entre otros.
+- Vista previa de la imagen original y la transformada.
+- Opción para descargar la imagen transformada.
 
-## Expanding the ESLint configuration
+## Tecnologías Utilizadas
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Frontend
+- **React** (con TypeScript): Desarrollo de la interfaz de usuario.
+- **Tailwind CSS**: Estilización moderna y responsiva.
+- **Framer Motion**: Animaciones.
+- **TsParticles**: Efecto de nieve.
 
-- Configure the top-level `parserOptions` property like this:
+### API y Servicios
+- **Cloudinary**: Almacenamiento, manipulación y transformación de imágenes.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Otras Herramientas
+- **Vite**: Herramienta de desarrollo.
+
+## Requisitos Previos
+
+1. Tener una cuenta en [Cloudinary](https://cloudinary.com/).
+2. Configurar los siguientes valores en un archivo `.env` en la raíz del proyecto:
+
+```env
+VITE_CLOUDNAME=<tu_nombre_de_cloudinary>
+VITE_UPLOAD_PRESET=<tu_preset_de_subida>
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Instalación y Uso
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+1. Clonar el repositorio:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+git clone https://github.com/JulianAgPerez/fohohoto.git
 ```
+
+2. Instalar las dependencias:
+
+```bash
+npm install
+```
+
+3. Iniciar el servidor de desarrollo:
+
+```bash
+npm run dev
+```
+
+4. Abrir en el navegador:
+
+```
+http://localhost:5173
+```
+
+## Cómo Funciona
+
+1. El usuario sube una imagen.
+2. Selecciona un efecto navideño de la lista desplegable.
+3. La imagen se sube a Cloudinary y se transforma con el efecto seleccionado.
+4. La imagen transformada se muestra como vista previa y está disponible para descargar.
+
+## Licencia
+
+Este proyecto está bajo la licencia [MIT](LICENSE).
+
+---
+
+¡Disfruta de tus imágenes navideñas transformadas! 🎄🎅
