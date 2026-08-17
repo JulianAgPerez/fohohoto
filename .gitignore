@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# AI tooling metadata (auto-generated, machine-specific)
+.atl/
