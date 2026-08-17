@@ -3,7 +3,29 @@ import SnowEffect from "./components/SnowEffect";
 import Home from "./view/Home";
 import ImageUploader from "./components/ImageUploader";
 
+const daysUntilChristmas = () => {
+  const today = new Date();
+  const todayStart = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  let christmas = new Date(todayStart.getFullYear(), 11, 25);
+  if (todayStart.getTime() > christmas.getTime()) {
+    christmas = new Date(todayStart.getFullYear() + 1, 11, 25);
+  }
+  return Math.round((christmas.getTime() - todayStart.getTime()) / 86400000);
+};
+
 const App: React.FC = () => {
+  const days = daysUntilChristmas();
+  const countdownText =
+    days === 0
+      ? "¡Feliz Navidad! 🎄"
+      : days === 1
+        ? "Falta 1 día para Navidad 🎄"
+        : `Faltan ${days} días para Navidad 🎄`;
+
   return (
     <div className="relative min-h-screen bg-blue-950">
       {/* Fondo nocturno */}
@@ -22,6 +44,7 @@ const App: React.FC = () => {
       <footer className="relative z-10 pb-10 pt-2 text-center text-sm text-amber-100/75">
         Hecho con ❤️ para las fiestas · Fohohoto 🎄 · De{" "}
         <a href="https://www.linkedin.com/in/julian-perez-dev/">Julian</a>
+        <p className="mt-1 text-xs text-amber-100/60">{countdownText}</p>
       </footer>
     </div>
   );
