@@ -6,7 +6,7 @@ import ImageUploader from "./components/ImageUploader";
 const App: React.FC = () => {
   return (
     <div className="relative min-h-screen bg-blue-950">
-      {/* Fondo nocturno compartido: mismo cielo en toda la página, fijo al scroll */}
+      {/* Fondo nocturno */}
       <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
         <div className="hero-sky absolute inset-0" />
         <div className="stars-bg absolute inset-0 opacity-60" />
@@ -19,8 +19,9 @@ const App: React.FC = () => {
           <ImageUploader />
         </section>
       </div>
-      <footer className="relative z-10 pb-10 pt-2 text-center text-sm text-amber-100/60">
-        Hecho con ❤️ para las fiestas · Fohohoto 🎄
+      <footer className="relative z-10 pb-10 pt-2 text-center text-sm text-amber-100/75">
+        Hecho con ❤️ para las fiestas · Fohohoto 🎄 · De{" "}
+        <a href="https://www.linkedin.com/in/julian-perez-dev/">Julian</a>
       </footer>
     </div>
   );
