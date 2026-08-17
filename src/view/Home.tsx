@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChristmasDictionary } from "../types/ChristmasDictionary";
+import { ChristmasGreetings } from "../types/ChristmasGreetings";
 
 const BULB_COLORS = ["#ef4444", "#fbbf24", "#22c55e", "#3b82f6"];
 
@@ -8,14 +8,8 @@ const Home = () => {
   const [index, setIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  const translations = useMemo(() => Object.values(ChristmasDictionary), []);
-  const keys = useMemo(() => Object.keys(ChristmasDictionary), []);
-
-  /** Palabra más larga: reserva el espacio del rotador para evitar cortes y saltos */
-  const longestWord = useMemo(
-    () => translations.reduce((a, b) => (a.length > b.length ? a : b)),
-    [translations]
-  );
+  const greetings = useMemo(() => Object.values(ChristmasGreetings), []);
+  const keys = useMemo(() => Object.keys(ChristmasGreetings), []);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -29,20 +23,13 @@ const Home = () => {
   useEffect(() => {
     if (reducedMotion) return;
     const interval = setInterval(() => {
-      setIndex((prevIndex) => (prevIndex + 1) % translations.length);
-    }, 2000);
+      setIndex((prevIndex) => (prevIndex + 1) % greetings.length);
+    }, 2500);
     return () => clearInterval(interval);
-  }, [translations, reducedMotion]);
+  }, [greetings, reducedMotion]);
 
   return (
-    <div className="relative flex h-screen min-h-[560px] flex-col items-center justify-center overflow-hidden bg-blue-950 px-4">
-      {/* Capa de fondo: cielo nocturno + estrellas + viñeta */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="hero-sky absolute inset-0" />
-        <div className="stars-bg absolute inset-0 opacity-60" />
-        <div className="hero-vignette absolute inset-0" />
-      </div>
-
+    <div className="relative flex h-screen min-h-[560px] flex-col items-center justify-center overflow-hidden px-4">
       {/* Guirnalda de luces titilantes */}
       <ul
         className="absolute inset-x-0 top-0 z-10 flex justify-around px-2"
@@ -62,8 +49,8 @@ const Home = () => {
         ))}
       </ul>
 
-      <div className="relative z-20 text-center">
-        {/* Idioma de la palabra actual */}
+      <div className="relative z-20 w-full max-w-5xl text-center">
+        {/* Idioma del saludo actual */}
         <AnimatePresence mode="wait">
           <motion.p
             key={keys[index]}
@@ -71,34 +58,25 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.4 }}
-            className="mb-5 text-xs font-semibold uppercase tracking-[0.35em] text-amber-200 sm:text-sm"
+            className="mb-6 text-xs font-semibold uppercase tracking-[0.35em] text-amber-200 sm:text-sm"
           >
             {keys[index]}
           </motion.p>
         </AnimatePresence>
 
-        <h1 className="flex items-center justify-center font-christmas text-4xl text-red-500 sm:text-6xl md:text-8xl lg:text-9xl">
-          ¡Feliz{" "}
-          <span className="relative inline-flex justify-center">
-            {/* Elemento invisible que reserva el ancho de la palabra más larga */}
-            <span aria-hidden="true" className="invisible whitespace-nowrap">
-              {longestWord}
-            </span>
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={translations[index]}
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -30 }}
-                transition={{ duration: 0.5 }}
-                className="absolute inset-0 flex items-center justify-center whitespace-nowrap"
-              >
-                {translations[index]}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-          <span>!</span>
-        </h1>
+        {/* Saludo completo que cambia de idioma */}
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={greetings[index]}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.5 }}
+            className="text-balance font-christmas text-3xl text-red-500 sm:text-5xl md:text-7xl lg:text-8xl"
+          >
+            {greetings[index]}
+          </motion.h1>
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -157,7 +157,7 @@ const ImageUploader: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-full bg-blue-900">
+    <div className="flex min-h-screen items-center justify-center px-4 py-16">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-center text-4xl text-red-500 font-bold mb-4">
           Sube tu imagen navideña 🎄
