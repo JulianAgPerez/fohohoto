@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChristmasGreetings } from "../types/ChristmasGreetings";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  ChristmasGreetings,
+  ChristmasGreetingLangCodes,
+  isLatinScript,
+} from "../types/ChristmasGreetings";
 import ChristmasLights from "../components/ChristmasLights";
 
 const Home = () => {
   const [index, setIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [paused, setPaused] = useState(false);
 
   const greetings = useMemo(() => Object.values(ChristmasGreetings), []);
   const keys = useMemo(() => Object.keys(ChristmasGreetings), []);
@@ -20,17 +25,37 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || paused) return;
     const interval = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % greetings.length);
-    }, 2500);
+    }, 4000);
     return () => clearInterval(interval);
-  }, [greetings, reducedMotion]);
+  }, [greetings, reducedMotion, paused]);
 
   return (
     <div className="relative flex h-screen min-h-[560px] flex-col items-center justify-center overflow-hidden px-4">
       {/* Guirnalda de luces titilantes */}
       <ChristmasLights className="absolute inset-x-0 top-0 z-10 px-2" />
+
+      {!reducedMotion && (
+        <button
+          type="button"
+          onClick={() => setPaused((p) => !p)}
+          aria-pressed={paused}
+          aria-label={paused ? "Reanudar saludos" : "Pausar saludos"}
+          className="absolute right-6 top-6 z-20 rounded-full border border-amber-200/30 bg-slate-900/50 p-2.5 text-amber-200/80 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30"
+        >
+          {paused ? (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+            </svg>
+          )}
+        </button>
+      )}
 
       <div className="relative z-20 w-full max-w-5xl text-center">
         {/* Marca */}
@@ -60,37 +85,35 @@ const Home = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.5 }}
-            className="text-balance font-christmas text-3xl text-red-500 sm:text-5xl md:text-7xl lg:text-8xl"
+            lang={ChristmasGreetingLangCodes[keys[index]]}
+            dir={
+              ["ar", "he"].includes(ChristmasGreetingLangCodes[keys[index]])
+                ? "rtl"
+                : "ltr"
+            }
+            className={`text-balance ${
+              isLatinScript(greetings[index]) ? "font-christmas" : "font-sans"
+            } text-3xl text-berry-500 sm:text-5xl md:text-7xl lg:text-8xl`}
           >
             {greetings[index]}
           </motion.h1>
         </AnimatePresence>
-      </div>
 
-      {/* Indicador de scroll */}
-      <button
-        type="button"
-        aria-label="Bajar a la herramienta"
-        onClick={() =>
-          document.getElementById("uploader")?.scrollIntoView({
-            behavior: reducedMotion ? "auto" : "smooth",
-          })
-        }
-        className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full p-2 text-amber-200/70 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30"
-      >
-        <svg
-          className="h-8 w-8 animate-bounce"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
+        <p className="mt-6 text-base text-amber-100/80 sm:text-lg">
+          Convierte tu foto en una postal navideña
+        </p>
+        <button
+          type="button"
+          onClick={() =>
+            document.getElementById("uploader")?.scrollIntoView({
+              behavior: reducedMotion ? "auto" : "smooth",
+            })
+          }
+          className="mt-8 rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-8 py-3.5 font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-berry-300/50"
         >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
-      </button>
+          Haz tu postal 🎄
+        </button>
+      </div>
     </div>
   );
 };

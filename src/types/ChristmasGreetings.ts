@@ -27,3 +27,37 @@ export const ChristmasGreetings: Record<string, string> = {
   Croatian: "Sretan Božić!",
   Serbian: "Срећан Божић!",
 };
+
+export const ChristmasGreetingLangCodes: Record<string, string> = {
+  Spanish: "es",
+  English: "en",
+  French: "fr",
+  German: "de",
+  Italian: "it",
+  Portuguese: "pt",
+  Dutch: "nl",
+  Russian: "ru",
+  Chinese: "zh",
+  Japanese: "ja",
+  Korean: "ko",
+  Arabic: "ar",
+  Greek: "el",
+  Hebrew: "he",
+  Hindi: "hi",
+  Turkish: "tr",
+  Swedish: "sv",
+  Danish: "da",
+  Finnish: "fi",
+  Norwegian: "no",
+  Polish: "pl",
+  Czech: "cs",
+  Hungarian: "hu",
+  Romanian: "ro",
+  Bulgarian: "bg",
+  Croatian: "hr",
+  Serbian: "sr",
+};
+
+const LATIN_ONLY = /^[\p{Script=Latin}\p{Script=Common}]+$/u;
+
+export const isLatinScript = (text: string): boolean => LATIN_ONLY.test(text);
