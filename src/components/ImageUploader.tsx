@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
@@ -72,6 +72,56 @@ const doubleEncodeTextLayer = (url: string): string => {
   });
 };
 
+const MAX_IMAGE_DIMENSION = 1200;
+
+const compressImage = (file: File): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      const scaleFactor = Math.min(
+        1,
+        MAX_IMAGE_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight),
+      );
+      const width = Math.round(image.naturalWidth * scaleFactor);
+      const height = Math.round(image.naturalHeight * scaleFactor);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        reject(new Error("No se pudo procesar la imagen."));
+        return;
+      }
+      ctx.drawImage(image, 0, 0, width, height);
+
+      const keepPng = file.type === "image/png";
+      const mimeType = keepPng ? "image/png" : "image/jpeg";
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error("No se pudo comprimir la imagen."));
+          }
+        },
+        mimeType,
+        keepPng ? undefined : 0.82,
+      );
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("No se pudo leer la imagen."));
+    };
+
+    image.src = url;
+  });
+};
+
 const ImageUploader: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -87,6 +137,10 @@ const ImageUploader: React.FC = () => {
   const [shareError, setShareError] = useState<boolean>(false);
   const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const hasGeneratedRef = useRef(false);
+  const transformRequestRef = useRef(0);
+  const handleTransformRef = useRef<() => Promise<void>>(async () => {});
+
   const cld = new Cloudinary({ cloud: { cloudName: cloud_name } });
 
   const handleFile = (file: File) => {
@@ -99,6 +153,7 @@ const ImageUploader: React.FC = () => {
     setImageFile(file);
     setPreviewUrl(URL.createObjectURL(file));
     setTransformedImage(null);
+    hasGeneratedRef.current = false;
   };
 
   const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
@@ -110,13 +165,18 @@ const ImageUploader: React.FC = () => {
 
   const handleUploadAndTransform = async () => {
     if (!imageFile) return;
+    const requestId = ++transformRequestRef.current;
     setLoading(true);
     setError(null);
-    const formData = new FormData();
-    formData.append("file", imageFile);
-    formData.append("upload_preset", upload_preset);
-
     try {
+      const compressed = await compressImage(imageFile);
+      if (requestId !== transformRequestRef.current) return;
+
+      const formData = new FormData();
+      const extension = compressed.type.split("/")[1] ?? "jpg";
+      formData.append("file", compressed, `fohohoto-upload.${extension}`);
+      formData.append("upload_preset", upload_preset);
+
       const response = await fetch(
         `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
         {
@@ -124,6 +184,7 @@ const ImageUploader: React.FC = () => {
           body: formData,
         },
       );
+      if (requestId !== transformRequestRef.current) return;
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -137,31 +198,25 @@ const ImageUploader: React.FC = () => {
         message,
       );
 
-      const uploadedTransformedImage =
-        await uploadTransformedImage(transformedUrl);
-
-      setTransformedImage(uploadedTransformedImage);
-
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
-      if (!prefersReducedMotion) {
-        confetti({
-          count: 120,
-          spread: 75,
-          position: { x: 50, y: 70 },
-          colors: ["#ef4444", "#fbbf24", "#22c55e", "#3b82f6", "#ffffff"],
-        });
-      }
+      const transformed = await uploadTransformedImage(transformedUrl);
+      if (requestId !== transformRequestRef.current) return;
+      setTransformedImage(transformed);
     } catch (error) {
+      if (requestId !== transformRequestRef.current) return;
       console.error("Error uploading image:", error);
       setError(
         "Hubo un problema al subir o transformar la imagen. Intenta nuevamente.",
       );
-    } finally {
       setLoading(false);
     }
   };
+
+  handleTransformRef.current = handleUploadAndTransform;
+
+  useEffect(() => {
+    if (!hasGeneratedRef.current || !imageFile) return;
+    void handleTransformRef.current();
+  }, [selectedBackground, imageFile]);
 
   const applyChristmasEffects = (
     imageId: string,
@@ -285,6 +340,7 @@ const ImageUploader: React.FC = () => {
 
   const handleReset = () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
+    hasGeneratedRef.current = false;
     setImageFile(null);
     setPreviewUrl(null);
     setTransformedImage(null);
@@ -493,27 +549,58 @@ const ImageUploader: React.FC = () => {
                   Después
                 </p>
                 <div
-                  className="h-52 overflow-hidden rounded-xl border border-amber-200/20"
+                  className="relative h-52 overflow-hidden rounded-xl border border-amber-200/20"
                   style={{
                     backgroundImage:
                       "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.07), rgba(0,0,0,0.35))",
                   }}
                 >
-                  {loading ? (
-                    <div className="flex h-full items-center justify-center">
-                      <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-300/30 border-t-amber-300" />
-                    </div>
-                  ) : transformedImage ? (
+                  {transformedImage ? (
                     <img
                       src={transformedImage}
                       alt="Imagen transformada"
-                      onLoad={() => setLoading(false)}
+                      onLoad={() => {
+                        hasGeneratedRef.current = true;
+                        setLoading(false);
+                        const prefersReducedMotion = window.matchMedia(
+                          "(prefers-reduced-motion: reduce)",
+                        ).matches;
+                        if (!prefersReducedMotion) {
+                          confetti({
+                            count: 120,
+                            spread: 75,
+                            position: { x: 50, y: 70 },
+                            colors: [
+                              "#ef4444",
+                              "#fbbf24",
+                              "#22c55e",
+                              "#3b82f6",
+                              "#ffffff",
+                            ],
+                          });
+                        }
+                      }}
+                      onError={() => {
+                        setLoading(false);
+                        setError(
+                          "No se pudo generar la postal. Intenta nuevamente.",
+                        );
+                      }}
                       className="h-full w-full"
                       style={{ objectFit: "contain" }}
                     />
+                  ) : loading ? (
+                    <div className="flex h-full items-center justify-center">
+                      <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-300/30 border-t-amber-300" />
+                    </div>
                   ) : (
                     <div className="flex h-full items-center justify-center px-4 text-center text-sm text-amber-100/70">
                       Tu postal navideña aparecerá acá ✨
+                    </div>
+                  )}
+                  {loading && transformedImage && (
+                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-950/50">
+                      <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-300/30 border-t-amber-300" />
                     </div>
                   )}
                 </div>
