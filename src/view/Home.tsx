@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChristmasGreetings } from "../types/ChristmasGreetings";
-
-const BULB_COLORS = ["#ef4444", "#fbbf24", "#22c55e", "#3b82f6"];
+import ChristmasLights from "../components/ChristmasLights";
 
 const Home = () => {
   const [index, setIndex] = useState(0);
@@ -31,23 +30,7 @@ const Home = () => {
   return (
     <div className="relative flex h-screen min-h-[560px] flex-col items-center justify-center overflow-hidden px-4">
       {/* Guirnalda de luces titilantes */}
-      <ul
-        className="absolute inset-x-0 top-0 z-10 flex justify-around px-2"
-        aria-hidden="true"
-      >
-        {Array.from({ length: 14 }).map((_, i) => (
-          <li
-            key={i}
-            className="christmas-light h-2.5 w-2.5 rounded-full"
-            style={{
-              backgroundColor: BULB_COLORS[i % BULB_COLORS.length],
-              boxShadow: `0 0 12px ${BULB_COLORS[i % BULB_COLORS.length]}`,
-              animationDelay: `${(i % 7) * 0.35}s`,
-              animationDuration: `${1.6 + (i % 4) * 0.4}s`,
-            }}
-          />
-        ))}
-      </ul>
+      <ChristmasLights className="absolute inset-x-0 top-0 z-10 px-2" />
 
       <div className="relative z-20 w-full max-w-5xl text-center">
         {/* Idioma del saludo actual */}

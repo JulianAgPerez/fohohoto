@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
 import { scale } from "@cloudinary/url-gen/actions/resize";
+import ChristmasLights from "./ChristmasLights";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
@@ -158,7 +159,10 @@ const ImageUploader: React.FC = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-16">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <div className="relative bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        {/* Guirnalda de luces en el borde de la card */}
+        <ChristmasLights count={10} className="absolute inset-x-0 -top-3 z-10 px-4" />
+        <ChristmasLights count={10} className="absolute inset-x-0 -bottom-3 z-10 px-4" />
         <h1 className="text-center text-4xl text-red-500 font-bold mb-4">
           Sube tu imagen navideña 🎄
         </h1>
