@@ -190,7 +190,14 @@ const ImageUploader: React.FC = () => {
         <div className="flex flex-wrap gap-4">
           {/* Imagen original */}
           {previewUrl && (
-            <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg mb-4 justify-center items-center flex">
+            <div
+              className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg mb-4 justify-center items-center flex"
+              style={{
+                backgroundImage:
+                  "repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%)",
+                backgroundSize: "24px 24px",
+              }}
+            >
               <img
                 src={previewUrl}
                 alt="Imagen Seleccionada"
@@ -203,7 +210,14 @@ const ImageUploader: React.FC = () => {
             </div>
           )}
           {/* Imagen transformada */}
-          <div className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg justify-center items-center flex">
+          <div
+            className="w-full h-52 border-4 border-green-500 rounded-lg overflow-hidden shadow-lg justify-center items-center flex"
+            style={{
+              backgroundImage:
+                "repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%)",
+              backgroundSize: "24px 24px",
+            }}
+          >
             {loading ? (
               <div
                 className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-success motion-reduce:animate-[spin_1.5s_linear_infinite]"
@@ -222,7 +236,7 @@ const ImageUploader: React.FC = () => {
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "fill",
+                    objectFit: "contain",
                   }}
                 />
               )

@@ -4,6 +4,7 @@ export default {
   theme: {
   extend: {
     fontFamily: {
+      sans: ['Quicksand', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       christmas: ['"Mountains of Christmas"', 'cursive'],
     },
   },
