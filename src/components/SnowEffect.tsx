@@ -1,7 +1,6 @@
 import { FC, useEffect, useMemo, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import {
-  type Container,
   type ISourceOptions,
   MoveDirection,
   OutMode,
@@ -19,14 +18,13 @@ const SnowEffect: FC = () => {
     });
   }, []);
 
-  const particlesLoaded = async (container?: Container): Promise<void> => {
-    console.log(container);
-  };
-
-  const options: ISourceOptions = useMemo(
-    () => ({
+  const options: ISourceOptions = useMemo(() => {
+    /* const coarsePointer = window.matchMedia("(pointer: coarse)").matches; */
+    return {
       fpsLimit: 60,
-      interactivity: {
+      interactivity: /* coarsePointer
+        ? {}
+        : */ {
         events: {
           onHover: {
             enable: true,
@@ -72,18 +70,11 @@ const SnowEffect: FC = () => {
         },
       },
       detectRetina: true, //habilita la detección de pantallas de alta densidad de píxeles (o.o)
-    }),
-    []
-  );
+    };
+  }, []);
 
   if (init) {
-    return (
-      <Particles
-        id="tsparticles"
-        particlesLoaded={particlesLoaded}
-        options={options}
-      />
-    );
+    return <Particles id="tsparticles" options={options} />;
   }
 
   return <></>;
