@@ -7,3 +7,63 @@
     @apply font-sans;
   }
 }
+
+@layer components {
+  .hero-sky {
+    background-image: radial-gradient(
+      ellipse at top,
+      #1e3a8a 0%,
+      #172554 45%,
+      #0c1445 100%
+    );
+  }
+
+  .hero-vignette {
+    background-image: radial-gradient(
+      ellipse at center,
+      transparent 45%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+  }
+
+  .stars-bg {
+    background-image:
+      radial-gradient(1px 1px at 25% 20%, rgba(255, 255, 255, 0.9), transparent),
+      radial-gradient(1px 1px at 70% 45%, rgba(255, 255, 255, 0.7), transparent),
+      radial-gradient(1.5px 1.5px at 40% 70%, rgba(255, 255, 255, 0.8), transparent),
+      radial-gradient(1px 1px at 85% 25%, rgba(255, 255, 255, 0.6), transparent),
+      radial-gradient(1.5px 1.5px at 10% 60%, rgba(255, 255, 255, 0.7), transparent),
+      radial-gradient(1px 1px at 55% 85%, rgba(255, 255, 255, 0.5), transparent),
+      radial-gradient(1px 1px at 90% 80%, rgba(255, 255, 255, 0.6), transparent),
+      radial-gradient(1.5px 1.5px at 15% 15%, rgba(255, 255, 255, 0.8), transparent);
+    background-size: 600px 600px;
+  }
+
+  .christmas-light {
+    animation-name: twinkle;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
