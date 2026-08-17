@@ -9,28 +9,42 @@ const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset = "upload-unsigned_presets";
 
 const backgrounds = [
-  { key: "Navideño", emoji: "🎄", prompt: "Add a christmas background" },
+  {
+    key: "Navideño",
+    emoji: "🎄",
+    description: "Ambiente navideño clásico",
+    prompt: "Add a christmas background",
+  },
   {
     key: "Nieve",
     emoji: "❄️",
+    description: "Nieve y atmósfera invernal",
     prompt: "Add snow and a Christmas atmosphere to the background",
   },
   {
     key: "Santa Claus",
     emoji: "🎅",
+    description: "Santa en el cielo con nieve",
     prompt: "Add santa claus in the sky with snow",
   },
   {
     key: "¡Regalos!",
     emoji: "🎁",
+    description: "Regalos y árbol de Navidad",
     prompt: "Add gifts and a christmas tree to the background",
   },
   {
     key: "Elfos",
     emoji: "🧝",
+    description: "Un elfo y un gorrito navideño",
     prompt: "Add an elf to the background and add me a Christmas hat",
   },
-  { key: "Soy un Grinch", emoji: "💚", prompt: "Add a Grinch to the background" },
+  {
+    key: "Soy un Grinch",
+    emoji: "💚",
+    description: "Un Grinch en el fondo",
+    prompt: "Add a Grinch to the background",
+  },
 ];
 
 const validImageTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -287,6 +301,9 @@ const ImageUploader: React.FC = () => {
                 </span>
                 <span className="text-sm font-semibold text-amber-50">
                   {bg.key}
+                </span>
+                <span className="text-[11px] leading-tight text-amber-100/50">
+                  {bg.description}
                 </span>
               </button>
             );

@@ -15,7 +15,9 @@ const App: React.FC = () => {
       <div className="relative z-10">
         <Home />
         <SnowEffect />
-        <ImageUploader />
+        <section id="uploader">
+          <ImageUploader />
+        </section>
       </div>
     </div>
   );

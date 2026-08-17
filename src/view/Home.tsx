@@ -61,6 +61,31 @@ const Home = () => {
           </motion.h1>
         </AnimatePresence>
       </div>
+
+      {/* Indicador de scroll */}
+      <button
+        type="button"
+        aria-label="Bajar a la herramienta"
+        onClick={() =>
+          document.getElementById("uploader")?.scrollIntoView({
+            behavior: reducedMotion ? "auto" : "smooth",
+          })
+        }
+        className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2 rounded-full p-2 text-amber-200/70 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30"
+      >
+        <svg
+          className="h-8 w-8 animate-bounce"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </button>
     </div>
   );
 };
