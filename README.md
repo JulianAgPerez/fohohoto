@@ -30,7 +30,7 @@ Fohohoto es una aplicación web para subir imágenes y aplicar efectos navideño
 
 ```env
 VITE_CLOUDNAME=<tu_nombre_de_cloudinary>
-VITE_UPLOAD_PRESET=<tu_preset_de_subida>
+VITE_UPLOAD_PRESET=<tu_preset_de_subida> # opcional: si no se define, se usa "upload-unsigned_presets"
 ```
 
 ## Instalación y Uso

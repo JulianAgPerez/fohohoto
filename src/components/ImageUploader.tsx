@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
 import { scale } from "@cloudinary/url-gen/actions/resize";
 import ChristmasLights from "./ChristmasLights";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
-const upload_preset = "upload-unsigned_presets";
+const upload_preset =
+  import.meta.env.VITE_UPLOAD_PRESET ?? "upload-unsigned_presets";
 
 const backgrounds = [
   {
@@ -168,7 +169,9 @@ const ImageUploader: React.FC = () => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
-        link.download = "imagen_navidena.jpg";
+        const originalName = imageFile?.name ?? "imagen_navidena";
+        const baseName = originalName.replace(/\.[^.]+$/, "") || "imagen_navidena";
+        link.download = `${baseName}_navidena.jpg`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -192,15 +195,15 @@ const ImageUploader: React.FC = () => {
           className="absolute inset-x-0 -bottom-3 z-10 px-4"
         />
 
-        <h2 className="mb-1 text-center font-christmas text-3xl text-red-400 sm:text-4xl">
+        <h2 className="mb-1 text-center font-christmas text-3xl text-berry-400 sm:text-4xl">
           Sube tu imagen navideña 🎄
         </h2>
-        <p className="mb-6 text-center text-sm text-amber-100/60">
+        <p className="mb-6 text-center text-sm text-amber-100/75">
           Elige un fondo y conviértela en una postal
         </p>
 
         {/* Paso 1: tu foto */}
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/50">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
           1 · Tu foto
         </p>
         <label
@@ -238,7 +241,7 @@ const ImageUploader: React.FC = () => {
               <span className="text-sm font-medium text-amber-100">
                 {imageFile?.name}
               </span>
-              <span className="text-xs text-amber-100/50">
+              <span className="text-xs text-amber-100/70">
                 Toca para cambiar la foto
               </span>
             </>
@@ -261,7 +264,7 @@ const ImageUploader: React.FC = () => {
               <span className="text-sm font-medium text-amber-100">
                 Arrastra tu foto aquí o toca para elegir
               </span>
-              <span className="text-xs text-amber-100/50">
+              <span className="text-xs text-amber-100/70">
                 JPEG, PNG o WEBP
               </span>
             </>
@@ -271,14 +274,14 @@ const ImageUploader: React.FC = () => {
         {error && (
           <p
             role="alert"
-            className="mt-3 rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-300"
+            className="mt-3 rounded-lg bg-berry-500/15 px-3 py-2 text-sm text-berry-300"
           >
             {error}
           </p>
         )}
 
         {/* Paso 2: fondo */}
-        <p className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wider text-amber-100/50">
+        <p className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
           2 · Elige un fondo
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -302,7 +305,7 @@ const ImageUploader: React.FC = () => {
                 <span className="text-sm font-semibold text-amber-50">
                   {bg.key}
                 </span>
-                <span className="text-[11px] leading-tight text-amber-100/50">
+                <span className="text-xs leading-tight text-amber-100/80">
                   {bg.description}
                 </span>
               </button>
@@ -315,7 +318,7 @@ const ImageUploader: React.FC = () => {
           type="button"
           onClick={handleUploadAndTransform}
           disabled={!imageFile || loading}
-          className="mt-6 w-full rounded-full bg-gradient-to-r from-red-500 to-rose-600 px-6 py-3 font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-red-400 hover:to-rose-500 focus:outline-none focus-visible:ring-4 focus-visible:ring-red-300/50 disabled:cursor-not-allowed disabled:opacity-40"
+          className="mt-6 w-full rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-6 py-3 font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-berry-300/50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {loading ? "Transformando..." : "Transformar mi foto ✨"}
         </button>
@@ -331,17 +334,23 @@ const ImageUploader: React.FC = () => {
               transition={{ duration: 0.35 }}
               className="mt-6 space-y-4"
             >
+              <span className="sr-only" aria-live="polite">
+                {loading
+                  ? "Transformando tu foto"
+                  : transformedImage
+                    ? "Tu postal navideña está lista"
+                    : ""}
+              </span>
               {previewUrl && (
                 <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/50">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
                     Antes
                   </p>
                   <div
-                    className="h-40 overflow-hidden rounded-xl border border-amber-200/20"
+                    className="h-52 overflow-hidden rounded-xl border border-amber-200/20"
                     style={{
                       backgroundImage:
-                        "repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%)",
-                      backgroundSize: "24px 24px",
+                        "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.07), rgba(0,0,0,0.35))",
                     }}
                   >
                     <img
@@ -355,15 +364,14 @@ const ImageUploader: React.FC = () => {
               )}
 
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/50">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
                   Después
                 </p>
                 <div
                   className="h-52 overflow-hidden rounded-xl border border-amber-200/20"
                   style={{
                     backgroundImage:
-                      "repeating-conic-gradient(#334155 0% 25%, #1e293b 0% 50%)",
-                    backgroundSize: "24px 24px",
+                      "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.07), rgba(0,0,0,0.35))",
                   }}
                 >
                   {loading ? (
@@ -379,7 +387,7 @@ const ImageUploader: React.FC = () => {
                       style={{ objectFit: "contain" }}
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center px-4 text-center text-sm text-amber-100/40">
+                    <div className="flex h-full items-center justify-center px-4 text-center text-sm text-amber-100/70">
                       Tu postal navideña aparecerá acá ✨
                     </div>
                   )}
@@ -399,7 +407,7 @@ const ImageUploader: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleDownload}
-                    className="flex-1 rounded-full bg-gradient-to-r from-red-500 to-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-red-400 hover:to-rose-500"
+                    className="flex-1 rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600"
                   >
                     Descargar
                   </button>
@@ -408,6 +416,10 @@ const ImageUploader: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <p className="mt-6 text-center text-xs text-amber-100/60">
+          Tu foto se procesa en la nube con Cloudinary
+        </p>
       </div>
     </div>
   );
