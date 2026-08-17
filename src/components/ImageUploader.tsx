@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { generativeBackgroundReplace } from "@cloudinary/url-gen/actions/effect";
 import { scale } from "@cloudinary/url-gen/actions/resize";
+import { source } from "@cloudinary/url-gen/actions/overlay";
+import { text } from "@cloudinary/url-gen/qualifiers/source";
+import { Position } from "@cloudinary/url-gen/qualifiers/position";
+import { TextStyle } from "@cloudinary/url-gen/qualifiers/textStyle";
+import { compass } from "@cloudinary/url-gen/qualifiers/gravity";
+import { confetti } from "@tsparticles/confetti";
 import ChristmasLights from "./ChristmasLights";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
@@ -50,16 +56,36 @@ const backgrounds = [
 
 const validImageTypes = ["image/jpeg", "image/png", "image/webp"];
 
+// Cloudinary: en el segmento l_text el texto debe ir doble-codificado (%25 en
+// vez de %) para que caracteres reservados (coma, slash, acentos, emojis) no
+// rompan el parser de transformaciones. La fuente no se toca.
+const doubleEncodeTextLayer = (url: string): string => {
+  return url.replace(/l_text:[^:/]+(?::[^/]*)?/g, (segment) => {
+    const firstColon = segment.indexOf(":");
+    const secondColon = segment.indexOf(":", firstColon + 1);
+    if (secondColon === -1) return segment;
+    const textStart = secondColon + 1;
+    return (
+      segment.slice(0, textStart) +
+      segment.slice(textStart).replace(/%/g, "%25")
+    );
+  });
+};
+
 const ImageUploader: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
   const [selectedBackground, setSelectedBackground] = useState<string>(
-    backgrounds[0].key
+    backgrounds[0].key,
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [message, setMessage] = useState<string>("");
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
+  const [shareError, setShareError] = useState<boolean>(false);
+  const shareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const cld = new Cloudinary({ cloud: { cloudName: cloud_name } });
 
@@ -96,7 +122,7 @@ const ImageUploader: React.FC = () => {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       if (!response.ok) {
@@ -107,25 +133,41 @@ const ImageUploader: React.FC = () => {
 
       const transformedUrl = applyChristmasEffects(
         data.public_id,
-        selectedBackground
+        selectedBackground,
+        message,
       );
 
-      const uploadedTransformedImage = await uploadTransformedImage(
-        transformedUrl
-      );
+      const uploadedTransformedImage =
+        await uploadTransformedImage(transformedUrl);
 
       setTransformedImage(uploadedTransformedImage);
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      if (!prefersReducedMotion) {
+        confetti({
+          count: 120,
+          spread: 75,
+          position: { x: 50, y: 70 },
+          colors: ["#ef4444", "#fbbf24", "#22c55e", "#3b82f6", "#ffffff"],
+        });
+      }
     } catch (error) {
       console.error("Error uploading image:", error);
       setError(
-        "Hubo un problema al subir o transformar la imagen. Intenta nuevamente."
+        "Hubo un problema al subir o transformar la imagen. Intenta nuevamente.",
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const applyChristmasEffects = (imageId: string, backgroundKey: string) => {
+  const applyChristmasEffects = (
+    imageId: string,
+    backgroundKey: string,
+    messageText: string,
+  ) => {
     const cldImage = cld.image(imageId);
     const background = backgrounds.find((bg) => bg.key === backgroundKey);
     const prompt = background?.prompt ?? backgroundKey;
@@ -135,7 +177,19 @@ const ImageUploader: React.FC = () => {
       .resize(scale().width(1000).height(1000))
       .format("auto")
       .quality("auto:best");
-    return cldImage.toURL();
+
+    if (messageText.trim()) {
+      cldImage.overlay(
+        source(
+          text(
+            messageText,
+            new TextStyle("Mountains of Christmas@google", 60),
+          ).textColor("white"),
+        ).position(new Position().gravity(compass("south")).offsetY(40)),
+      );
+    }
+
+    return doubleEncodeTextLayer(cldImage.toURL());
   };
 
   const uploadTransformedImage = async (transformedUrl: string) => {
@@ -148,13 +202,22 @@ const ImageUploader: React.FC = () => {
       {
         method: "POST",
         body: formData,
-      }
+      },
     );
 
     if (!response.ok) {
-      throw new Error(
-        `Error al subir la imagen transformada: ${response.statusText}`
-      );
+      let detail = response.statusText;
+      const cldError = response.headers.get("X-Cld-Error");
+      if (cldError) detail = cldError;
+      try {
+        const errorBody = await response.json();
+        if (errorBody?.error?.message) {
+          detail = errorBody.error.message;
+        }
+      } catch {
+        // Sin cuerpo JSON, se queda con statusText / X-Cld-Error
+      }
+      throw new Error(`Error al subir la imagen transformada: ${detail}`);
     }
 
     const data = await response.json();
@@ -170,7 +233,8 @@ const ImageUploader: React.FC = () => {
         const link = document.createElement("a");
         link.href = url;
         const originalName = imageFile?.name ?? "imagen_navidena";
-        const baseName = originalName.replace(/\.[^.]+$/, "") || "imagen_navidena";
+        const baseName =
+          originalName.replace(/\.[^.]+$/, "") || "imagen_navidena";
         link.download = `${baseName}_navidena.jpg`;
         document.body.appendChild(link);
         link.click();
@@ -180,6 +244,54 @@ const ImageUploader: React.FC = () => {
         console.error("Error al descargar la imagen:", error);
       }
     }
+  };
+
+  const showShareFeedback = (text: string, isError: boolean) => {
+    if (shareTimeoutRef.current) clearTimeout(shareTimeoutRef.current);
+    setShareError(isError);
+    setShareFeedback(text);
+    shareTimeoutRef.current = setTimeout(() => {
+      setShareFeedback(null);
+    }, 3000);
+  };
+
+  const handleShare = async () => {
+    if (!transformedImage) return;
+    try {
+      const response = await fetch(transformedImage);
+      const blob = await response.blob();
+      const originalName = imageFile?.name ?? "imagen_navidena";
+      const baseName =
+        originalName.replace(/\.[^.]+$/, "") || "imagen_navidena";
+      const file = new File([blob], `${baseName}_navidena.jpg`, {
+        type: "image/jpeg",
+      });
+
+      if (navigator.share) {
+        await navigator.share({
+          files: [file],
+          title: "Fohohoto",
+          text: "Mi postal navideña 🎄",
+        });
+      } else {
+        await navigator.clipboard.writeText(transformedImage);
+        showShareFeedback("Link copiado ✅", false);
+      }
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      showShareFeedback("No se pudo compartir. Usá Descargar.", true);
+    }
+  };
+
+  const handleReset = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setImageFile(null);
+    setPreviewUrl(null);
+    setTransformedImage(null);
+    setError(null);
+    setMessage("");
+    setSelectedBackground(backgrounds[0].key);
+    document.getElementById("uploader")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -313,7 +425,20 @@ const ImageUploader: React.FC = () => {
           })}
         </div>
 
-        {/* Paso 3: transformar */}
+        {/* Paso 3: mensaje */}
+        <p className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
+          3 · Tu mensaje (opcional)
+        </p>
+        <input
+          type="text"
+          maxLength={60}
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+          placeholder="Ej: Feliz Navidad, familia ❤️"
+          className="w-full rounded-xl border border-amber-200/15 bg-slate-800/40 px-4 py-3 text-sm text-amber-50 placeholder:text-amber-100/40 focus:border-amber-300/60 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
+        />
+
+        {/* Paso 4: transformar */}
         <button
           type="button"
           onClick={handleUploadAndTransform}
@@ -395,22 +520,49 @@ const ImageUploader: React.FC = () => {
               </div>
 
               {transformedImage && !loading && (
-                <div className="flex gap-3">
-                  <a
-                    href={transformedImage}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 rounded-full border border-amber-200/40 px-4 py-2.5 text-center text-sm font-semibold text-amber-100 transition hover:bg-amber-200/10"
-                  >
-                    Ver imagen
-                  </a>
-                  <button
-                    type="button"
-                    onClick={handleDownload}
-                    className="flex-1 rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600"
-                  >
-                    Descargar
-                  </button>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={handleShare}
+                      className="rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600"
+                    >
+                      📤 Compartir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDownload}
+                      className="rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600"
+                    >
+                      Descargar
+                    </button>
+                    <a
+                      href={transformedImage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-full border border-amber-200/40 px-4 py-2.5 text-center text-sm font-semibold text-amber-100 transition hover:bg-amber-200/10"
+                    >
+                      Ver imagen
+                    </a>
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      className="rounded-full border border-amber-200/40 px-4 py-2.5 text-center text-sm font-semibold text-amber-100 transition hover:bg-amber-200/10"
+                    >
+                      Hacer otra postal
+                    </button>
+                  </div>
+                  {shareFeedback && (
+                    <p
+                      role="status"
+                      aria-live="polite"
+                      className={`text-center text-sm ${
+                        shareError ? "text-berry-300" : "text-emerald-300"
+                      }`}
+                    >
+                      {shareFeedback}
+                    </p>
+                  )}
                 </div>
               )}
             </motion.div>
