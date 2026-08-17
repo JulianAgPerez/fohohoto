@@ -33,6 +33,11 @@ const Home = () => {
       <ChristmasLights className="absolute inset-x-0 top-0 z-10 px-2" />
 
       <div className="relative z-20 w-full max-w-5xl text-center">
+        {/* Marca */}
+        <p className="mb-8 font-christmas text-2xl text-amber-100/90 sm:text-3xl">
+          Fohohoto
+        </p>
+
         {/* Idioma del saludo actual */}
         <AnimatePresence mode="wait">
           <motion.p

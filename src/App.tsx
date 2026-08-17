@@ -19,6 +19,9 @@ const App: React.FC = () => {
           <ImageUploader />
         </section>
       </div>
+      <footer className="relative z-10 pb-10 pt-2 text-center text-sm text-amber-100/60">
+        Hecho con ❤️ para las fiestas · Fohohoto 🎄
+      </footer>
     </div>
   );
 };
