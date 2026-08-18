@@ -22,12 +22,11 @@ interface TreeNote {
 }
 
 const ORNAMENT_COLORS = [
-  "#fbbf24", // amber
-  "#ef4444", // berry
-  "#22c55e", // green
-  "#f87171", // berry claro
-  "#60a5fa", // blue
-  "#a78bfa", // violet
+  { id: "orn-berry", from: "#ef4444", to: "#dc2626" },
+  { id: "orn-green", from: "#22c55e", to: "#16a34a" },
+  { id: "orn-gold", from: "#fbbf24", to: "#f59e0b" },
+  { id: "orn-blue", from: "#3b82f6", to: "#2563eb" },
+  { id: "orn-cream", from: "#f8fafc", to: "#e2e8f0" },
 ];
 
 const ORNAMENT_POSITIONS: { x: number; y: number; r: number }[] = [
@@ -210,8 +209,19 @@ const ChristmasTree: React.FC = () => {
   };
 
   const handleTreeClick = (event: ReactMouseEvent<SVGSVGElement>) => {
-    const svg = svgRef.current;
-    if (!svg || !isSupabaseConfigured || submitting) return;
+    // Ignora clicks fuera del arbol - usan hit-testing nativo
+    const svg = event.currentTarget;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+      ctm.inverse(),
+    );
+    const canopies = svg.querySelectorAll('[data-layer="canopy"]');
+    const inside = Array.from(canopies).some((el) =>
+      (el as SVGGeometryElement).isPointInFill(point),
+    );
+    if (!inside) return;
+    if (!isSupabaseConfigured || submitting) return;
     const rect = svg.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
     const viewBox = svg.viewBox.baseVal;
@@ -267,6 +277,15 @@ const ChristmasTree: React.FC = () => {
             onClick={handleTreeClick}
           >
             <title>{t("tree.title")}</title>
+            {/* Gradientes radiales de las bolas */}
+            <defs>
+              {ORNAMENT_COLORS.map((c) => (
+                <radialGradient key={c.id} id={c.id} cx="35%" cy="30%" r="75%">
+                  <stop offset="0%" stopColor={c.from} />
+                  <stop offset="100%" stopColor={c.to} />
+                </radialGradient>
+              ))}
+            </defs>
             {/* Estrella */}
             <path
               d="M120 10 l4.6 10.4 11.3 1.4 -8.4 7.8 2.3 11.2 -9.8 -5.7 -9.8 5.7 2.3 -11.2 -8.4 -7.8 11.3 -1.4 z"
@@ -275,13 +294,39 @@ const ChristmasTree: React.FC = () => {
               strokeWidth="1.5"
             />
             {/* Copas del árbol */}
-            <polygon points="120,42 62,140 178,140" fill="#047857" />
-            <polygon points="120,90 48,200 192,200" fill="#065f46" />
-            <polygon points="120,138 34,260 206,260" fill="#064e3b" />
+            <polygon
+              points="120,42 62,140 178,140"
+              fill="#047857"
+              data-layer="canopy"
+            />
+            <polygon
+              points="120,90 48,200 192,200"
+              fill="#065f46"
+              data-layer="canopy"
+            />
+            <polygon
+              points="120,138 34,260 206,260"
+              fill="#064e3b"
+              data-layer="canopy"
+            />
             {/* Tronco */}
-            <rect x="106" y="260" width="28" height="28" rx="3" fill="#92400e" />
+            <rect
+              x="106"
+              y="260"
+              width="28"
+              height="28"
+              rx="3"
+              fill="#92400e"
+            />
             {/* Sombra en la base */}
-            <ellipse cx="120" cy="292" rx="92" ry="9" fill="#020617" opacity="0.5" />
+            <ellipse
+              cx="120"
+              cy="292"
+              rx="92"
+              ry="9"
+              fill="#020617"
+              opacity="0.5"
+            />
             {/* Luces en los bordes */}
             {TREE_LIGHTS.map((point, i) => (
               <circle
@@ -301,6 +346,7 @@ const ChristmasTree: React.FC = () => {
             {treeNotes.map((note, i) => {
               const position = getNotePosition(note, i);
               const color = ORNAMENT_COLORS[i % ORNAMENT_COLORS.length];
+              const fillId = `url(#${color.id})`;
               const label = note.name?.trim()
                 ? `${note.name.trim()} — ${note.message}`
                 : note.message;
@@ -311,7 +357,10 @@ const ChristmasTree: React.FC = () => {
                   tabIndex={0}
                   aria-label={label}
                   className="ornament-swing cursor-pointer"
-                  style={{ transformBox: "fill-box", transformOrigin: "top center" }}
+                  style={{
+                    transformBox: "fill-box",
+                    transformOrigin: "top center",
+                  }}
                   onClick={(event) => {
                     event.stopPropagation();
                     openNote(note);
@@ -328,20 +377,37 @@ const ChristmasTree: React.FC = () => {
                   onFocus={() => setHoveredNote({ note, index: i })}
                   onBlur={() => setHoveredNote(null)}
                 >
+                  <line
+                    x1={position.x}
+                    y1={position.y - position.r - 12}
+                    x2={position.x}
+                    y2={position.y - position.r}
+                    stroke="#d6d3d1"
+                    strokeWidth="0.8"
+                  />
                   <circle
                     cx={position.x}
                     cy={position.y}
                     r={position.r + 4}
-                    fill={color}
-                    opacity="0.25"
+                    fill={fillId}
+                    opacity="0.2"
                   />
                   <circle
                     cx={position.x}
                     cy={position.y}
                     r={position.r}
-                    fill={color}
+                    fill={fillId}
                     stroke="rgba(255,255,255,0.55)"
                     strokeWidth="1"
+                  />
+                  <ellipse
+                    cx={position.x - position.r * 0.35}
+                    cy={position.y - position.r * 0.4}
+                    rx={position.r * 0.3}
+                    ry={position.r * 0.16}
+                    fill="#ffffff"
+                    opacity="0.35"
+                    transform={`rotate(-28 ${position.x - position.r * 0.35} ${position.y - position.r * 0.4})`}
                   />
                   <text
                     x={position.x}
@@ -375,7 +441,10 @@ const ChristmasTree: React.FC = () => {
                   stroke="#fcd34d"
                   strokeWidth="2.5"
                   className="animate-ping"
-                  style={{ transformBox: "fill-box", transformOrigin: "center" }}
+                  style={{
+                    transformBox: "fill-box",
+                    transformOrigin: "center",
+                  }}
                 />
                 <circle
                   cx={selectedPosition.x}
@@ -392,11 +461,13 @@ const ChristmasTree: React.FC = () => {
               className="pointer-events-none absolute z-20 max-w-[220px] -translate-x-1/2 -translate-y-[calc(100%+12px)] rounded-lg bg-slate-900/90 px-2.5 py-1.5 text-xs leading-snug text-amber-50 shadow-lg shadow-black/40 ring-1 ring-amber-200/20"
               style={{
                 left: `${
-                  (getNotePosition(hoveredNote.note, hoveredNote.index).x / 240) *
+                  (getNotePosition(hoveredNote.note, hoveredNote.index).x /
+                    240) *
                   100
                 }%`,
                 top: `${
-                  (getNotePosition(hoveredNote.note, hoveredNote.index).y / 320) *
+                  (getNotePosition(hoveredNote.note, hoveredNote.index).y /
+                    320) *
                   100
                 }%`,
               }}
