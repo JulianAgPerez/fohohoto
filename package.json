@@ -12,6 +12,7 @@
   "dependencies": {
     "@cloudinary/react": "^1.13.1",
     "@cloudinary/url-gen": "^1.21.0",
+    "@supabase/supabase-js": "^2.112.3",
     "@tsparticles/confetti": "^4.3.2",
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.7.1",

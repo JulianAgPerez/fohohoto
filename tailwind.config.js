@@ -6,6 +6,7 @@ export default {
       fontFamily: {
         sans: ['Quicksand', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         christmas: ['"Mountains of Christmas"', 'cursive'],
+        handwriting: ['Caveat', 'cursive'],
       },
       colors: {
         berry: {

@@ -1,7 +1,10 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import SnowEffect from "./components/SnowEffect";
 import Home from "./view/Home";
 import ImageUploader from "./components/ImageUploader";
+import { useI18n } from "./i18n";
+
+const ChristmasTree = lazy(() => import("./components/ChristmasTree"));
 
 const daysUntilChristmas = () => {
   const today = new Date();
@@ -18,13 +21,14 @@ const daysUntilChristmas = () => {
 };
 
 const App: React.FC = () => {
+  const { t } = useI18n();
   const days = daysUntilChristmas();
   const countdownText =
     days === 0
-      ? "¡Feliz Navidad! 🎄"
+      ? t("countdown.merryChristmas")
       : days === 1
-        ? "Falta 1 día para Navidad 🎄"
-        : `Faltan ${days} días para Navidad 🎄`;
+        ? t("countdown.oneDay")
+        : t("countdown.days", { n: days });
 
   return (
     <div className="relative min-h-screen bg-blue-950">
@@ -40,9 +44,20 @@ const App: React.FC = () => {
         <section id="uploader">
           <ImageUploader />
         </section>
+        <section id="arbol">
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center px-4 py-16">
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-amber-300/30 border-t-amber-300" />
+              </div>
+            }
+          >
+            <ChristmasTree />
+          </Suspense>
+        </section>
       </div>
       <footer className="relative z-10 pb-10 pt-2 text-center text-sm text-amber-100/75">
-        Hecho con ❤️ para las fiestas · Fohohoto 🎄 · De{" "}
+        {t("footer.credit")}
         <a href="https://www.linkedin.com/in/julian-perez-dev/">Julian</a>
         <p className="mt-1 text-xs text-amber-100/60">{countdownText}</p>
       </footer>

@@ -44,6 +44,17 @@
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
   }
+
+  .sticky-tape {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.55),
+      rgba(253, 230, 138, 0.45)
+    );
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+  }
 }
 
 @keyframes twinkle {
@@ -55,6 +66,33 @@
   50% {
     opacity: 1;
     transform: scale(1.15);
+  }
+}
+
+@keyframes swing {
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(7deg);
+  }
+  40% {
+    transform: rotate(-6deg);
+  }
+  60% {
+    transform: rotate(4deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (hover: hover) {
+  .ornament-swing:hover {
+    animation: swing 1.2s ease-in-out infinite;
   }
 }
 

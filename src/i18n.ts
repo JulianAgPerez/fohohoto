@@ -82,6 +82,9 @@ const es = {
     empty: "Todavía no hay notas. ¡Colgá la primera!",
     anonymous: "Anónimo",
     noteCount: "{n} deseos colgados en el árbol 🎄",
+    viewAll: "Ver todas las notas ({n})",
+    hideAll: "Ocultar notas",
+    close: "Cerrar",
   },
   bg: {
     "Navideño": { label: "Navideño", desc: "Ambiente navideño clásico" },
@@ -173,6 +176,9 @@ const en: Dictionary = {
     empty: "No notes yet. Hang the first one!",
     anonymous: "Anonymous",
     noteCount: "{n} wishes hanging on the tree 🎄",
+    viewAll: "View all notes ({n})",
+    hideAll: "Hide notes",
+    close: "Close",
   },
   bg: {
     "Navideño": { label: "Classic", desc: "Classic Christmas atmosphere" },
