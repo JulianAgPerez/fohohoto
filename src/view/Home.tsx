@@ -6,14 +6,24 @@ import {
   isLatinScript,
 } from "../types/ChristmasGreetings";
 import ChristmasLights from "../components/ChristmasLights";
+import { useI18n } from "../i18n";
 
 const Home = () => {
+  const { t, lang, setLang } = useI18n();
   const [index, setIndex] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [paused, setPaused] = useState(false);
 
-  const greetings = useMemo(() => Object.values(ChristmasGreetings), []);
-  const keys = useMemo(() => Object.keys(ChristmasGreetings), []);
+  const entries = useMemo(() => {
+    const all = Object.entries(ChristmasGreetings);
+    const preferredKey = lang === "en" ? "English" : "Spanish";
+    return [
+      [preferredKey, ChristmasGreetings[preferredKey]],
+      ...all.filter(([key]) => key !== preferredKey),
+    ];
+  }, [lang]);
+  const greetings = useMemo(() => entries.map(([, value]) => value), [entries]);
+  const keys = useMemo(() => entries.map(([key]) => key), [entries]);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -32,25 +42,50 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [greetings, reducedMotion, paused]);
 
+  useEffect(() => {
+    setIndex((prevIndex) => (prevIndex >= greetings.length ? 0 : prevIndex));
+  }, [greetings.length]);
+
   return (
     <div className="relative flex h-screen min-h-[560px] flex-col items-center justify-center overflow-hidden px-4">
       {/* Guirnalda de luces titilantes */}
       <ChristmasLights className="absolute inset-x-0 top-0 z-10 px-2" />
+
+      <button
+        type="button"
+        onClick={() => setLang(lang === "es" ? "en" : "es")}
+        aria-pressed={lang === "en"}
+        aria-label={t("lang.button")}
+        title={t("lang.button")}
+        className="absolute left-6 top-6 z-20 rounded-full border border-amber-200/30 bg-slate-900/50 p-2.5 text-xs font-semibold uppercase tracking-wider text-amber-200/80 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30"
+      >
+        <span aria-hidden="true">🌐</span> {lang === "es" ? "ES" : "EN"}
+      </button>
 
       {!reducedMotion && (
         <button
           type="button"
           onClick={() => setPaused((p) => !p)}
           aria-pressed={paused}
-          aria-label={paused ? "Reanudar saludos" : "Pausar saludos"}
+          aria-label={paused ? t("greetings.resume") : t("greetings.pause")}
           className="absolute right-6 top-6 z-20 rounded-full border border-amber-200/30 bg-slate-900/50 p-2.5 text-amber-200/80 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30"
         >
           {paused ? (
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <path d="M8 5v14l11-7z" />
             </svg>
           ) : (
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+            >
               <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
             </svg>
           )}
@@ -100,7 +135,7 @@ const Home = () => {
         </AnimatePresence>
 
         <p className="mt-6 text-base text-amber-100/80 sm:text-lg">
-          Convierte tu foto en una postal navideña
+          {t("hero.subtitle")}
         </p>
         <button
           type="button"
@@ -111,7 +146,7 @@ const Home = () => {
           }
           className="mt-8 rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-8 py-3.5 font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-berry-300/50"
         >
-          Haz tu postal 🎄
+          {t("hero.cta")}
         </button>
       </div>
     </div>

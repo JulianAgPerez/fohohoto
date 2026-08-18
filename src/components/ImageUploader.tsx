@@ -10,6 +10,7 @@ import { TextStyle } from "@cloudinary/url-gen/qualifiers/textStyle";
 import { compass } from "@cloudinary/url-gen/qualifiers/gravity";
 import { confetti } from "@tsparticles/confetti";
 import ChristmasLights from "./ChristmasLights";
+import { useI18n } from "../i18n";
 
 const cloud_name = import.meta.env.VITE_CLOUDNAME as string;
 const upload_preset =
@@ -19,37 +20,31 @@ const backgrounds = [
   {
     key: "Navideño",
     emoji: "🎄",
-    description: "Ambiente navideño clásico",
     prompt: "Add a christmas background",
   },
   {
     key: "Nieve",
     emoji: "❄️",
-    description: "Nieve y atmósfera invernal",
     prompt: "Add snow and a Christmas atmosphere to the background",
   },
   {
     key: "Santa Claus",
     emoji: "🎅",
-    description: "Santa en el cielo con nieve",
     prompt: "Add santa claus in the sky with snow",
   },
   {
     key: "¡Regalos!",
     emoji: "🎁",
-    description: "Regalos y árbol de Navidad",
     prompt: "Add gifts and a christmas tree to the background",
   },
   {
     key: "Elfos",
     emoji: "🧝",
-    description: "Un elfo y un gorrito navideño",
     prompt: "Add an elf to the background and add me a Christmas hat",
   },
   {
     key: "Soy un Grinch",
     emoji: "💚",
-    description: "Un Grinch en el fondo",
     prompt: "Add a Grinch to the background",
   },
 ];
@@ -123,6 +118,7 @@ const compressImage = (file: File): Promise<Blob> => {
 };
 
 const ImageUploader: React.FC = () => {
+  const { t } = useI18n();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [transformedImage, setTransformedImage] = useState<string | null>(null);
@@ -145,7 +141,7 @@ const ImageUploader: React.FC = () => {
 
   const handleFile = (file: File) => {
     if (!validImageTypes.includes(file.type)) {
-      setError("Formato no válido. Sube una imagen JPEG, PNG o WEBP.");
+      setError(t("uploader.invalidFormat"));
       return;
     }
     if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -205,7 +201,7 @@ const ImageUploader: React.FC = () => {
       if (requestId !== transformRequestRef.current) return;
       console.error("Error uploading image:", error);
       setError(
-        "Hubo un problema al subir o transformar la imagen. Intenta nuevamente.",
+        t("uploader.uploadError"),
       );
       setLoading(false);
     }
@@ -326,15 +322,15 @@ const ImageUploader: React.FC = () => {
         await navigator.share({
           files: [file],
           title: "Fohohoto",
-          text: "Mi postal navideña 🎄",
+          text: t("uploader.shareText"),
         });
       } else {
         await navigator.clipboard.writeText(transformedImage);
-        showShareFeedback("Link copiado ✅", false);
+        showShareFeedback(t("uploader.linkCopied"), false);
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
-      showShareFeedback("No se pudo compartir. Usá Descargar.", true);
+      showShareFeedback(t("uploader.shareError"), true);
     }
   };
 
@@ -364,15 +360,15 @@ const ImageUploader: React.FC = () => {
         />
 
         <h2 className="mb-1 text-center font-christmas text-3xl text-berry-400 sm:text-4xl">
-          Sube tu imagen navideña 🎄
+          {t("uploader.title")}
         </h2>
         <p className="mb-6 text-center text-sm text-amber-100/75">
-          Elige un fondo y conviértela en una postal
+          {t("uploader.subtitle")}
         </p>
 
         {/* Paso 1: tu foto */}
         <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
-          1 · Tu foto
+          {t("uploader.step1")}
         </p>
         <label
           htmlFor="image-upload"
@@ -403,14 +399,14 @@ const ImageUploader: React.FC = () => {
             <>
               <img
                 src={previewUrl}
-                alt="Vista previa de la imagen elegida"
+                alt={t("uploader.previewAlt")}
                 className="h-28 w-28 rounded-xl border border-amber-200/30 object-cover shadow-lg"
               />
               <span className="text-sm font-medium text-amber-100">
                 {imageFile?.name}
               </span>
               <span className="text-xs text-amber-100/70">
-                Toca para cambiar la foto
+                {t("uploader.changePhoto")}
               </span>
             </>
           ) : (
@@ -430,10 +426,10 @@ const ImageUploader: React.FC = () => {
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
               <span className="text-sm font-medium text-amber-100">
-                Arrastra tu foto aquí o toca para elegir
+                {t("uploader.dropzone")}
               </span>
               <span className="text-xs text-amber-100/70">
-                JPEG, PNG o WEBP
+                {t("uploader.dropzoneHint")}
               </span>
             </>
           )}
@@ -450,7 +446,7 @@ const ImageUploader: React.FC = () => {
 
         {/* Paso 2: fondo */}
         <p className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
-          2 · Elige un fondo
+          {t("uploader.step2")}
         </p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {backgrounds.map((bg) => {
@@ -471,10 +467,10 @@ const ImageUploader: React.FC = () => {
                   {bg.emoji}
                 </span>
                 <span className="text-sm font-semibold text-amber-50">
-                  {bg.key}
+                  {t(`bg.${bg.key}.label`)}
                 </span>
                 <span className="text-xs leading-tight text-amber-100/80">
-                  {bg.description}
+                  {t(`bg.${bg.key}.desc`)}
                 </span>
               </button>
             );
@@ -483,14 +479,14 @@ const ImageUploader: React.FC = () => {
 
         {/* Paso 3: mensaje */}
         <p className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
-          3 · Tu mensaje (opcional)
+          {t("uploader.step3")}
         </p>
         <input
           type="text"
           maxLength={60}
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder="Ej: Feliz Navidad, familia ❤️"
+          placeholder={t("uploader.messagePlaceholder")}
           className="w-full rounded-xl border border-amber-200/15 bg-slate-800/40 px-4 py-3 text-sm text-amber-50 placeholder:text-amber-100/40 focus:border-amber-300/60 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
         />
 
@@ -501,7 +497,7 @@ const ImageUploader: React.FC = () => {
           disabled={!imageFile || loading}
           className="mt-6 w-full rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-6 py-3 font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-berry-300/50 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          {loading ? "Transformando..." : "Transformar mi foto ✨"}
+          {loading ? t("uploader.loading") : t("uploader.transform")}
         </button>
 
         {/* Resultado */}
@@ -517,15 +513,15 @@ const ImageUploader: React.FC = () => {
             >
               <span className="sr-only" aria-live="polite">
                 {loading
-                  ? "Transformando tu foto"
+                  ? t("uploader.srTransforming")
                   : transformedImage
-                    ? "Tu postal navideña está lista"
+                    ? t("uploader.srReady")
                     : ""}
               </span>
               {previewUrl && (
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
-                    Antes
+                    {t("uploader.before")}
                   </p>
                   <div
                     className="h-52 overflow-hidden rounded-xl border border-amber-200/20"
@@ -536,7 +532,7 @@ const ImageUploader: React.FC = () => {
                   >
                     <img
                       src={previewUrl}
-                      alt="Imagen original"
+                      alt={t("uploader.originalAlt")}
                       className="h-full w-full"
                       style={{ objectFit: "contain" }}
                     />
@@ -545,9 +541,9 @@ const ImageUploader: React.FC = () => {
               )}
 
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
-                  Después
-                </p>
+<p className="mb-2 text-xs font-semibold uppercase tracking-wider text-amber-100/60">
+                    {t("uploader.after")}
+                  </p>
                 <div
                   className="relative h-52 overflow-hidden rounded-xl border border-amber-200/20"
                   style={{
@@ -558,7 +554,7 @@ const ImageUploader: React.FC = () => {
                   {transformedImage ? (
                     <img
                       src={transformedImage}
-                      alt="Imagen transformada"
+                      alt={t("uploader.transformedAlt")}
                       onLoad={() => {
                         hasGeneratedRef.current = true;
                         setLoading(false);
@@ -582,9 +578,7 @@ const ImageUploader: React.FC = () => {
                       }}
                       onError={() => {
                         setLoading(false);
-                        setError(
-                          "No se pudo generar la postal. Intenta nuevamente.",
-                        );
+                        setError(t("uploader.generateError"));
                       }}
                       className="h-full w-full"
                       style={{ objectFit: "contain" }}
@@ -595,7 +589,7 @@ const ImageUploader: React.FC = () => {
                     </div>
                   ) : (
                     <div className="flex h-full items-center justify-center px-4 text-center text-sm text-amber-100/70">
-                      Tu postal navideña aparecerá acá ✨
+                      {t("uploader.pending")}
                     </div>
                   )}
                   {loading && transformedImage && (
@@ -614,14 +608,14 @@ const ImageUploader: React.FC = () => {
                       onClick={handleShare}
                       className="rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600"
                     >
-                      📤 Compartir
+                      {t("uploader.share")}
                     </button>
                     <button
                       type="button"
                       onClick={handleDownload}
                       className="rounded-full bg-gradient-to-r from-berry-600 to-berry-700 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-red-900/40 transition hover:from-berry-500 hover:to-berry-600"
                     >
-                      Descargar
+                      {t("uploader.download")}
                     </button>
                     <a
                       href={transformedImage}
@@ -629,14 +623,14 @@ const ImageUploader: React.FC = () => {
                       rel="noopener noreferrer"
                       className="rounded-full border border-amber-200/40 px-4 py-2.5 text-center text-sm font-semibold text-amber-100 transition hover:bg-amber-200/10"
                     >
-                      Ver imagen
+                      {t("uploader.viewImage")}
                     </a>
                     <button
                       type="button"
                       onClick={handleReset}
                       className="rounded-full border border-amber-200/40 px-4 py-2.5 text-center text-sm font-semibold text-amber-100 transition hover:bg-amber-200/10"
                     >
-                      Hacer otra postal
+                      {t("uploader.makeAnother")}
                     </button>
                   </div>
                   {shareFeedback && (
@@ -657,7 +651,7 @@ const ImageUploader: React.FC = () => {
         </AnimatePresence>
 
         <p className="mt-6 text-center text-xs text-amber-100/60">
-          Tu foto se procesa en la nube con Cloudinary
+          {t("uploader.cloudinary")}
         </p>
       </div>
     </div>
