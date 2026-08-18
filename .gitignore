@@ -26,3 +26,4 @@ dist-ssr
 
 # AI tooling metadata (auto-generated, machine-specific)
 .atl/
+.codegraph/
