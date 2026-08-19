@@ -11,6 +11,7 @@ const es = {
   hero: {
     subtitle: "Convierte tu foto en una postal navideña",
     cta: "Haz tu postal 🎄",
+    magicLine: "La magia de la Navidad no habla idiomas",
   },
   greetings: {
     pause: "Pausar saludos",
@@ -26,6 +27,12 @@ const es = {
   },
   footer: {
     credit: "Hecho con ❤️ para las fiestas · Fohohoto 🎄 · De ",
+  },
+  timeline: {
+    home: "Inicio",
+    postcard: "Tu postal",
+    tree: "Árbol colaborativo",
+    aria: "Timeline de la página",
   },
   uploader: {
     title: "Sube tu imagen navideña 🎄",
@@ -122,6 +129,7 @@ const en: Dictionary = {
   hero: {
     subtitle: "Turn your photo into a Christmas card",
     cta: "Make your card 🎄",
+    magicLine: "The magic of Christmas needs no translation",
   },
   greetings: {
     pause: "Pause greetings",
@@ -137,6 +145,12 @@ const en: Dictionary = {
   },
   footer: {
     credit: "Made with ❤️ for the holidays · Fohohoto 🎄 · By ",
+  },
+  timeline: {
+    home: "Start",
+    postcard: "Your card",
+    tree: "Collaborative tree",
+    aria: "Page timeline",
   },
   uploader: {
     title: "Upload your Christmas image 🎄",

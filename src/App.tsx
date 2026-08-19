@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import SnowEffect from "./components/SnowEffect";
 import Home from "./view/Home";
 import ImageUploader from "./components/ImageUploader";
+import ChristmasTimeline from "./components/ChristmasTimeline";
 import { useI18n } from "./i18n";
 
 const ChristmasTree = lazy(() => import("./components/ChristmasTree"));
@@ -41,7 +42,7 @@ const App: React.FC = () => {
       <div className="relative z-10">
         <Home />
         <SnowEffect />
-        <section id="uploader">
+        <section id="uploader" className="relative">
           <ImageUploader />
         </section>
         <section id="arbol">
@@ -61,6 +62,7 @@ const App: React.FC = () => {
         <a href="https://www.linkedin.com/in/julian-perez-dev/">Julian</a>
         <p className="mt-1 text-xs text-amber-100/60">{countdownText}</p>
       </footer>
+      <ChristmasTimeline />
     </div>
   );
 };

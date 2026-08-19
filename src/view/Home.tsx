@@ -134,6 +134,9 @@ const Home = () => {
           </motion.h1>
         </AnimatePresence>
 
+        <p className="mt-4 font-handwriting text-base text-amber-100/75 sm:text-lg">
+          {t("hero.magicLine")}
+        </p>
         <p className="mt-6 text-base text-amber-100/80 sm:text-lg">
           {t("hero.subtitle")}
         </p>
