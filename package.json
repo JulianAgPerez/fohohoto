@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.112.3",
     "@tsparticles/confetti": "^4.3.2",
     "@tsparticles/plugin-interactivity": "^4.3.2",
+    "@tsparticles/preset-snow": "^4.3.2",
     "@tsparticles/react": "^4.3.2",
     "@tsparticles/slim": "^4.3.2",
     "@tsparticles/updater-wobble": "^4.3.2",
