@@ -788,7 +788,7 @@ const ChristmasTree: React.FC = () => {
                     return (
                       <label
                         key={type}
-                        className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition ${
+                        className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition focus-within:ring-2 focus-within:ring-amber-300/50 ${
                           selected
                             ? "border-amber-300/70 bg-amber-300/20 text-amber-50"
                             : "border-amber-200/15 bg-slate-800/40 text-amber-100/70 hover:border-amber-200/40"
@@ -834,7 +834,7 @@ const ChristmasTree: React.FC = () => {
                 </legend>
                 <div className="flex flex-wrap gap-2">
                   <label
-                    className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition ${
+                    className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition focus-within:ring-2 focus-within:ring-amber-300/50 ${
                       ornamentColor === null
                         ? "border-amber-300/70 bg-amber-300/20 text-amber-50"
                         : "border-amber-200/15 bg-slate-800/40 text-amber-100/70 hover:border-amber-200/40"
@@ -862,7 +862,7 @@ const ChristmasTree: React.FC = () => {
                     return (
                       <label
                         key={c.id}
-                        className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition ${
+                        className={`flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition focus-within:ring-2 focus-within:ring-amber-300/50 ${
                           selected
                             ? "border-amber-300/70 bg-amber-300/20 text-amber-50"
                             : "border-amber-200/15 bg-slate-800/40 text-amber-100/70 hover:border-amber-200/40"
