@@ -8,7 +8,6 @@ import { text } from "@cloudinary/url-gen/qualifiers/source";
 import { Position } from "@cloudinary/url-gen/qualifiers/position";
 import { TextStyle } from "@cloudinary/url-gen/qualifiers/textStyle";
 import { compass } from "@cloudinary/url-gen/qualifiers/gravity";
-import { confetti } from "@tsparticles/confetti";
 import ChristmasLights from "./ChristmasLights";
 import { useI18n } from "../i18n";
 
@@ -483,10 +482,12 @@ const ImageUploader: React.FC = () => {
         </p>
         <input
           type="text"
+          name="message"
           maxLength={60}
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder={t("uploader.messagePlaceholder")}
+          aria-label={t("uploader.step3")}
           className="w-full rounded-xl border border-amber-200/15 bg-slate-800/40 px-4 py-3 text-sm text-amber-50 placeholder:text-amber-100/40 focus:border-amber-300/60 focus:outline-none focus:ring-2 focus:ring-amber-300/40"
         />
 
@@ -555,13 +556,16 @@ const ImageUploader: React.FC = () => {
                     <img
                       src={transformedImage}
                       alt={t("uploader.transformedAlt")}
-                      onLoad={() => {
+                      onLoad={async () => {
                         hasGeneratedRef.current = true;
                         setLoading(false);
                         const prefersReducedMotion = window.matchMedia(
                           "(prefers-reduced-motion: reduce)",
                         ).matches;
                         if (!prefersReducedMotion) {
+                          const { confetti } = await import(
+                            "@tsparticles/confetti"
+                          );
                           confetti({
                             count: 120,
                             spread: 75,
