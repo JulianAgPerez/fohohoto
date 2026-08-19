@@ -235,10 +235,12 @@ const ChristmasTimeline: React.FC = () => {
     {
       id: "tree",
       label: t("timeline.tree"),
-      action: () =>
+      action: () => {
+        window.dispatchEvent(new Event("fohohoto:tree-request"));
         document
           .getElementById("arbol")
-          ?.scrollIntoView({ behavior: "smooth" }),
+          ?.scrollIntoView({ behavior: "smooth" });
+      },
     },
   ];
 
@@ -285,7 +287,7 @@ const ChristmasTimeline: React.FC = () => {
       className={`fixed z-50 ${
         desktop
           ? "top-1/2 right-6 -translate-y-1/2"
-          : "top-3 left-1/2 -translate-x-1/2"
+          : "pointer-events-none top-3 left-1/2 -translate-x-1/2"
       }`}
     >
       <div
@@ -325,7 +327,7 @@ const ChristmasTimeline: React.FC = () => {
             onClick={stop.action}
             aria-label={stop.label}
             title={stop.label}
-            className={`group absolute z-20 flex h-7 w-7 items-center justify-center rounded-full border border-slate-600 bg-slate-900 text-amber-200 shadow-md shadow-black/30 transition hover:border-amber-300 hover:text-amber-50 focus-visible:border-amber-300 focus-visible:text-amber-50 focus-visible:outline-none ${
+            className={`group pointer-events-auto absolute z-20 flex h-7 w-7 items-center justify-center rounded-full border border-slate-600 bg-slate-900 text-amber-200 shadow-md shadow-black/30 transition hover:border-amber-300 hover:text-amber-50 focus-visible:border-amber-300 focus-visible:text-amber-50 focus-visible:outline-none ${
               desktop ? "left-1/2 -translate-x-1/2" : "top-1/2 -translate-y-1/2"
             }`}
             style={

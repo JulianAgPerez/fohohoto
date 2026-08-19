@@ -57,7 +57,7 @@ const Home = () => {
         aria-pressed={lang === "en"}
         aria-label={t("lang.button")}
         title={t("lang.button")}
-        className="absolute left-6 top-6 z-20 rounded-full border border-amber-200/30 bg-slate-900/50 p-2.5 text-xs font-semibold uppercase tracking-wider text-amber-200/80 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30"
+        className="absolute left-6 top-14 z-20 rounded-full border border-amber-200/30 bg-slate-900/50 p-3 text-xs font-semibold uppercase tracking-wider text-amber-200/80 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30 md:top-6"
       >
         <span aria-hidden="true">🌐</span> {lang === "es" ? "ES" : "EN"}
       </button>
@@ -68,7 +68,7 @@ const Home = () => {
           onClick={() => setPaused((p) => !p)}
           aria-pressed={paused}
           aria-label={paused ? t("greetings.resume") : t("greetings.pause")}
-          className="absolute right-6 top-6 z-20 rounded-full border border-amber-200/30 bg-slate-900/50 p-2.5 text-amber-200/80 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30"
+          className="absolute right-6 top-14 z-20 rounded-full border border-amber-200/30 bg-slate-900/50 p-3 text-amber-200/80 transition hover:text-amber-100 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-200/30 md:top-6"
         >
           {paused ? (
             <svg
