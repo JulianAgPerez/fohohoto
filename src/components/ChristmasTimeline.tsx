@@ -18,7 +18,12 @@ interface Stop {
 const clamp = (value: number): number => Math.min(100, Math.max(0, value));
 
 const StarIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="currentColor"
+    aria-hidden="true"
+  >
     <path d="M12 2l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17l-5.8 3 1.1-6.5L2.6 8.8l6.5-.9L12 2z" />
   </svg>
 );
@@ -48,7 +53,12 @@ const PostcardIcon: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 const TreeIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    className={className}
+    fill="currentColor"
+    aria-hidden="true"
+  >
     <path d="M12 1.8L17 8.5H7z" />
     <path d="M12 6.5L19 14.5H5z" />
     <path d="M12 11.5L20.5 21H3.5z" />
@@ -99,7 +109,11 @@ const SantaSvg: React.FC<{
           strokeWidth="1.8"
         />
         {/* Hombro/espalda con capa */}
-        <path d="M12.5 27.5 C 12.5 22.5, 26 22.5, 26 27.5" stroke="#ef4444" strokeWidth="2" />
+        <path
+          d="M12.5 27.5 C 12.5 22.5, 26 22.5, 26 27.5"
+          stroke="#ef4444"
+          strokeWidth="2"
+        />
       </>
     ) : (
       <>
@@ -132,7 +146,11 @@ const SantaSvg: React.FC<{
           strokeWidth="1.8"
         />
         {/* Hombro/espalda con capa */}
-        <path d="M10.5 28 C 10.5 23.5, 25 23.5, 25 28" stroke="#ef4444" strokeWidth="2" />
+        <path
+          d="M10.5 28 C 10.5 23.5, 25 23.5, 25 28"
+          stroke="#ef4444"
+          strokeWidth="2"
+        />
       </>
     )}
   </svg>
@@ -162,21 +180,15 @@ const ChristmasTimeline: React.FC = () => {
 
   const measure = useCallback(() => {
     if (typeof document === "undefined") return;
-    const scrollable = Math.max(
-      1,
-      document.documentElement.scrollHeight - window.innerHeight,
-    );
-    const percentOf = (el: HTMLElement | null): number =>
-      el
-        ? clamp(
-            ((el.getBoundingClientRect().top + window.scrollY) / scrollable) *
-              100,
-          )
-        : 0;
+    const absoluteTop = (el: HTMLElement | null): number =>
+      el ? el.getBoundingClientRect().top + window.scrollY : 0;
+    const treeTop = Math.max(1, absoluteTop(document.getElementById("arbol")));
     setPositions({
       home: 0,
-      postcard: percentOf(document.getElementById("uploader")),
-      tree: percentOf(document.getElementById("arbol")),
+      postcard: clamp(
+        (absoluteTop(document.getElementById("uploader")) / treeTop) * 100,
+      ),
+      tree: 100,
     });
     const rect = trackRef.current?.getBoundingClientRect();
     if (rect && rect.width > 0 && rect.height > 0) {
@@ -187,9 +199,13 @@ const ChristmasTimeline: React.FC = () => {
   const update = useCallback(() => {
     rafRef.current = null;
     if (typeof document === "undefined") return;
-    const scrollable =
-      document.documentElement.scrollHeight - window.innerHeight;
-    setProgress(scrollable > 0 ? clamp((window.scrollY / scrollable) * 100) : 0);
+    const treeEl = document.getElementById("arbol");
+    if (!treeEl) return;
+    const treeTop = Math.max(
+      1,
+      treeEl.getBoundingClientRect().top + window.scrollY,
+    );
+    setProgress(clamp((window.scrollY / treeTop) * 100));
     measure();
   }, [measure]);
 
@@ -237,9 +253,27 @@ const ChristmasTimeline: React.FC = () => {
       label: t("timeline.tree"),
       action: () => {
         window.dispatchEvent(new Event("fohohoto:tree-request"));
-        document
-          .getElementById("arbol")
-          ?.scrollIntoView({ behavior: "smooth" });
+        const treeEl = document.getElementById("arbol");
+        if (!treeEl) return;
+        const scrollToTree = () => {
+          const top = treeEl.getBoundingClientRect().top + window.scrollY + 64;
+          window.scrollTo({ top, behavior: "smooth" });
+        };
+
+        if (treeEl.querySelector("h2")) {
+          scrollToTree();
+          return;
+        }
+        let attempts = 0;
+        const waitForTree = () => {
+          attempts += 1;
+          if (treeEl.querySelector("h2") || attempts > 120) {
+            scrollToTree();
+            return;
+          }
+          window.requestAnimationFrame(waitForTree);
+        };
+        window.requestAnimationFrame(waitForTree);
       },
     },
   ];
@@ -247,8 +281,7 @@ const ChristmasTimeline: React.FC = () => {
   const santaSize = 32;
   const halfSanta = santaSize / 2;
   const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 0;
-  const viewportHeight =
-    typeof window !== "undefined" ? window.innerHeight : 0;
+  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 0;
   const trackWidth =
     trackSize.width > 0
       ? trackSize.width
@@ -264,10 +297,7 @@ const ChristmasTimeline: React.FC = () => {
   const cappedProgress = Math.min(progress, positions.tree);
   const santaT = Math.min(
     1,
-    Math.max(
-      0,
-      cappedProgress / Math.max(positions.tree, 1),
-    ),
+    Math.max(0, cappedProgress / Math.max(positions.tree, 1)),
   );
   const treeButtonX = (positions.tree / 100) * trackWidth;
   const treeButtonY = (positions.tree / 100) * trackHeight;
@@ -312,7 +342,9 @@ const ChristmasTimeline: React.FC = () => {
         {/* Camino recorrido */}
         <div
           className={`absolute rounded-full bg-gradient-to-r from-amber-300 to-emerald-500 ${
-            desktop ? "top-0 left-1/2 w-1.5 -translate-x-1/2" : "top-1/2 left-0 h-1.5 -translate-y-1/2"
+            desktop
+              ? "top-0 left-1/2 w-1.5 -translate-x-1/2"
+              : "top-1/2 left-0 h-1.5 -translate-y-1/2"
           }`}
           style={
             desktop
@@ -358,9 +390,7 @@ const ChristmasTimeline: React.FC = () => {
               : "top-1/2 -translate-x-1/2 -translate-y-1/2"
           }`}
           style={
-            desktop
-              ? { top: `${santaCenter}px` }
-              : { left: `${santaCenter}px` }
+            desktop ? { top: `${santaCenter}px` } : { left: `${santaCenter}px` }
           }
         >
           <SantaSvg
